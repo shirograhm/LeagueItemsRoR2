@@ -199,7 +199,7 @@ namespace LeagueItems
                     float bonusCDR = hyperbolicPercentage * master.GetBody().damage;
                     bonusCDR = bonusCDR > SpearOfShojin.MAX_BONUS_CDR ? SpearOfShojin.MAX_BONUS_CDR : bonusCDR;
 
-                    string valueBonusCDRText = bonusCDR == 0 ? "0" : String.Format("{0:#}", bonusCDR);
+                    string valueBonusCDRText = bonusCDR == 0 ? "0" : String.Format("{0:#.##}", bonusCDR);
 
                     sb.AppendFormat(valueBonusCDRText);
                 }
@@ -214,7 +214,7 @@ namespace LeagueItems
                 {
                     float bonusBaseDamage = (TitanicHydra.firstStackBonusPercent + TitanicHydra.extraStackBonusPercent * (value - 1)) * master.GetBody().maxHealth;
 
-                    string valueBaseDamageText = bonusBaseDamage == 0 ? "0" : String.Format("{0:#}", bonusBaseDamage);
+                    string valueBaseDamageText = bonusBaseDamage == 0 ? "0" : String.Format("{0:#.#}", bonusBaseDamage);
 
                     sb.AppendFormat(valueBaseDamageText);
                 }

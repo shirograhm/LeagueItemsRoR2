@@ -11,10 +11,10 @@ namespace LeagueItems
     {
         public static ItemDef itemDef;
 
-        // Increase base damage by 2% (+0.5% per stack) of max health.
-        public static float firstStackBonusNumber = 2f;
+        // Increase base damage by 3% (+1% per stack) of max health.
+        public static float firstStackBonusNumber = 3f;
         public static float firstStackBonusPercent = firstStackBonusNumber / 100f;
-        public static float extraStackBonusNumber = 0.5f;
+        public static float extraStackBonusNumber = 1f;
         public static float extraStackBonusPercent = extraStackBonusNumber / 100f;
 
         public static Dictionary<UnityEngine.Networking.NetworkInstanceId, float> currentBonusBaseDamage = new Dictionary<UnityEngine.Networking.NetworkInstanceId, float>();
