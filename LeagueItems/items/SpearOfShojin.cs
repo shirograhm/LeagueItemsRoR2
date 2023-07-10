@@ -12,12 +12,16 @@ namespace LeagueItems
         public static ItemDef itemDef;
         public static BuffDef exigencyBuff;
 
-        // Gain 40% (+40% per stack) of your damage as bonus cooldown reduction, up to a maximum bonus of 40%.
+        public static Color32 shojinColor = new Color32(106, 230, 112, 255);
+
+        // Gain 25% (+25% per stack) of your base damage as bonus cooldown reduction, up to a maximum bonus of 40%.
         // Gain up to 15% bonus movement speed based on missing health.
+        public const int MAX_EXIGENCY_STACKS = 15;
+        
         public const float MAX_BONUS_CDR = 40.0f;
         public const float MAX_BONUS_MOVESPEED = 15.0f;
 
-        public static float cdrFromDamageNumber = 40.0f;
+        public static float cdrFromDamageNumber = 25.0f;
         public static float cdrFromDamagePercent = cdrFromDamageNumber / 100f;
 
         public static Dictionary<UnityEngine.Networking.NetworkInstanceId, float> bonusCooldownReduction = new Dictionary<UnityEngine.Networking.NetworkInstanceId, float>();
@@ -59,14 +63,14 @@ namespace LeagueItems
             exigencyBuff = ScriptableObject.CreateInstance<BuffDef>();
 
             exigencyBuff.name = "Exigency";
-            exigencyBuff.buffColor = new Color32(106, 230, 112, 255);
+            exigencyBuff.buffColor = shojinColor;
             exigencyBuff.iconSprite = Addressables.LoadAssetAsync<Sprite>("RoR2/Base/Common/MiscIcons/texMysteryIcon.png").WaitForCompletion();
             exigencyBuff.canStack = true;
         }
 
         private static void Hooks()
         {
-            On.RoR2.CharacterBody.Update += (orig, self) =>
+            On.RoR2.CharacterBody.FixedUpdate += (orig, self) =>
             {
                 orig(self);
 
@@ -76,10 +80,15 @@ namespace LeagueItems
                     // Scaled 66% missing health to 15% bonus movespeed. 4.4% missing health per 1% bonus movespeed.
                     int stacksToApply = (int) Math.Floor(missingHealth / 4.4f);
                     // Cap stacks at 15.
-                    stacksToApply = stacksToApply > 15 ? 15 : stacksToApply;
+                    stacksToApply = stacksToApply > MAX_EXIGENCY_STACKS ? MAX_EXIGENCY_STACKS : stacksToApply;
 
 #pragma warning disable Publicizer001 // Accessing a member that was not originally public
                     self.SetBuffCount(exigencyBuff.buffIndex, stacksToApply);
+                }
+
+                if (self.GetBuffCount(exigencyBuff) > 0)
+                {
+                    self.SetBuffCount(exigencyBuff.buffIndex, 0);
 #pragma warning restore Publicizer001 // Accessing a member that was not originally public
                 }
             };
@@ -89,14 +98,13 @@ namespace LeagueItems
                 if (sender.inventory && sender.master)
                 {
                     int itemCount = sender.inventory.GetItemCount(itemDef);
-
                     float hyperbolicPercentage = 1 - (1 / (1 + (cdrFromDamagePercent * itemCount)));
 
                     if (itemCount > 0)
                     {
                         float bonusCDR = hyperbolicPercentage * sender.damage;
                         // Cap at 40% bonus cooldown reduction
-                        bonusCDR = bonusCDR > 40f ? 40f : bonusCDR;
+                        bonusCDR = bonusCDR > MAX_BONUS_CDR ? MAX_BONUS_CDR : bonusCDR;
 
                         args.cooldownMultAdd -= bonusCDR / 100f;
                         Utilities.SetValueInDictionary(ref bonusCooldownReduction, sender.master, bonusCDR);
@@ -157,7 +165,7 @@ namespace LeagueItems
 
             // The Description is where you put the actual numbers and give an advanced description.
             LanguageAPI.Add("SoSDesc", "Gain <style=cIsUtility>" + cdrFromDamageNumber + "%</style> <style=cStack>(+" + cdrFromDamageNumber + "%)</style> "
-                                        + "of your damage as bonus cooldown reduction, up to a maximum bonus of 40%. "
+                                        + "of your base damage as bonus cooldown reduction, up to a maximum bonus of 40%. "
                                         + "Gain up to 15% bonus movement speed based on missing health.");
 
             // The Lore is, well, flavor. You can write pretty much whatever you want here.

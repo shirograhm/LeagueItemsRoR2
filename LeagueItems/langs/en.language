@@ -1,4 +1,5 @@
 ﻿{
+	"en": {
 		"ITEMSTATS_BT_LIFESTEAL": "Percent Lifesteal",
 		"ITEMSTATS_BOTRK_PERCENT": "Percent Current Health Damage",
 		"ITEMSTATS_DEADMANS_DAMAGE": "Proc Damage",
@@ -6,4 +7,5 @@
 		"ITEMSTATS_SHOJIN_COOLDOWN": "Cooldown Reduction",
 		"ITEMSTATS_HYDRA_PERCENT": "Percent Bonus Base Damage",
 		"ITEMSTATS_WARMOGS_HEALTH": "Percent Bonus Health"
+	}
 }

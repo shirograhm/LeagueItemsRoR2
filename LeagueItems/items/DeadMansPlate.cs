@@ -13,6 +13,8 @@ namespace LeagueItems
         public static ItemDef itemDef;
         public static BuffDef momentumBuff;
 
+        public static Color32 deadmansColor = new Color32(230, 92, 0, 255);
+
         // Gain a stack of Momentum every second, up to 10 stacks. Each stack gives 5% movement speed.
         // Once fully stacked, expend all stacks to deal 300% (+300% per item stack) bonus on-hit damage.
         public const int MAX_MOMENTUM_STACKS = 10;
@@ -26,7 +28,7 @@ namespace LeagueItems
         public static float timeOfLastStack = 0f;
 
         private static DamageAPI.ModdedDamageType deadMansDamageType;
-        public static DamageColorIndex deadMansDamageColor = DamageColorAPI.RegisterDamageColor(new Color32(230, 92, 0, 255));
+        public static DamageColorIndex deadMansDamageColor = DamageColorAPI.RegisterDamageColor(deadmansColor);
 
         public static Dictionary<UnityEngine.Networking.NetworkInstanceId, float> currentDamageProc = new Dictionary<UnityEngine.Networking.NetworkInstanceId, float>();
         public static Dictionary<UnityEngine.Networking.NetworkInstanceId, float> totalDamageDealt = new Dictionary<UnityEngine.Networking.NetworkInstanceId, float>();
@@ -70,14 +72,14 @@ namespace LeagueItems
             momentumBuff = ScriptableObject.CreateInstance<BuffDef>();
 
             momentumBuff.name = "Momentum";
-            momentumBuff.buffColor = new Color32(230, 92, 0, 255);
+            momentumBuff.buffColor = deadmansColor;
             momentumBuff.iconSprite = Addressables.LoadAssetAsync<Sprite>("RoR2/Base/Common/MiscIcons/texMysteryIcon.png").WaitForCompletion();
             momentumBuff.canStack = true;
         }
 
         private static void Hooks()
         {
-            On.RoR2.CharacterBody.Update += (orig, self) =>
+            On.RoR2.CharacterBody.FixedUpdate += (orig, self) =>
             {
                 orig(self);
 

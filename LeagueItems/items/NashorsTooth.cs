@@ -11,11 +11,13 @@ namespace LeagueItems
     {
         public static ItemDef itemDef;
 
+        public static Color32 nashorsColor = new Color32(176, 26, 94, 255);
+
         // Deals 2 (+2 per stack) damage per level on-hit.
         public static float onHitDamageAmount = 2f;
 
         public static DamageAPI.ModdedDamageType nashorsDamageType;
-        public static DamageColorIndex nashorsDamageColor = DamageColorAPI.RegisterDamageColor(new Color32(176, 26, 94, 255));
+        public static DamageColorIndex nashorsDamageColor = DamageColorAPI.RegisterDamageColor(nashorsColor);
 
         public static Dictionary<UnityEngine.Networking.NetworkInstanceId, float> cumOnHitDamage = new Dictionary<UnityEngine.Networking.NetworkInstanceId, float>();
         public static Dictionary<UnityEngine.Networking.NetworkInstanceId, float> totalDamageDone = new Dictionary<UnityEngine.Networking.NetworkInstanceId, float>();
@@ -54,7 +56,7 @@ namespace LeagueItems
 
         private static void Hooks()
         {
-            On.RoR2.CharacterBody.Update += (orig, self) =>
+            On.RoR2.CharacterBody.FixedUpdate += (orig, self) =>
             {
                 orig(self);
                 if (Integrations.itemStatsEnabled)
@@ -168,7 +170,7 @@ namespace LeagueItems
             LanguageAPI.Add("NTPickup", "Deal flat damage on-hit.");
 
             // The Description is where you put the actual numbers and give an advanced description.
-            LanguageAPI.Add("NTDesc", "Deal <style=cIsDamage>" + onHitDamageAmount + "</style> <style=cStack>(+" + onHitDamageAmount + ")</style> damage per level on-hit.");
+            LanguageAPI.Add("NTDesc", "Deal <style=cIsDamage>" + onHitDamageAmount + "</style> <style=cStack>(+" + onHitDamageAmount + " per stack)</style> per level on-hit.");
 
             // The Lore is, well, flavor. You can write pretty much whatever you want here.
             LanguageAPI.Add("NTLore", "A sword belonging to the Shadow Isles.");

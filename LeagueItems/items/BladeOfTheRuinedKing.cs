@@ -14,12 +14,14 @@ namespace LeagueItems
     {
         public static ItemDef itemDef;
 
+        public static Color32 botrkColor = new Color32(40, 179, 191, 255);
+
         // Deals 2% (+2% per stack) current health damage on-hit.
         public static float onHitDamageNumber = 2.0f;
         public static float onHitDamagePercent = onHitDamageNumber / 100f;
 
         private static DamageAPI.ModdedDamageType botrkDamageType;
-        public static DamageColorIndex botrkDamageColor = DamageColorAPI.RegisterDamageColor(new Color32(40, 179, 191, 255));
+        public static DamageColorIndex botrkDamageColor = DamageColorAPI.RegisterDamageColor(botrkColor);
 
         public static Dictionary<UnityEngine.Networking.NetworkInstanceId, float> totalDamageDone = new Dictionary<UnityEngine.Networking.NetworkInstanceId, float>();
 

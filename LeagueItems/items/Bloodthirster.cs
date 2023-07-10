@@ -11,7 +11,7 @@ namespace LeagueItems
     {
         public static ItemDef itemDef;
 
-        // Heal for 20% of damage dealt. Does not apply to on-hit effects.
+        // Heal for 20% of damage dealt on-hit.
         public static float bonusLifestealNumber = 20f;
         public static float bonusLifestealPercent = bonusLifestealNumber / 100f;
 
@@ -146,7 +146,7 @@ namespace LeagueItems
             LanguageAPI.Add("BTPickup", "Heal for a percentage of damage dealt.");
             
             // The Description is where you put the actual numbers and give an advanced description.
-            LanguageAPI.Add("BTDesc", "Heal for <style=cIsHealing>" + bonusLifestealNumber + "%</style> <style=cStack>(+" + bonusLifestealNumber + "%)</style> of the damage dealt. Does not apply to on-hit damage.");
+            LanguageAPI.Add("BTDesc", "Heal for <style=cIsHealing>" + bonusLifestealNumber + "%</style> <style=cStack>(+" + bonusLifestealNumber + "%)</style> of the damage dealt on-hit.");
 
             // The Lore is, well, flavor. You can write pretty much whatever you want here.
             LanguageAPI.Add("BTLore", "A large sword.");
