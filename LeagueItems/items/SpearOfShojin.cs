@@ -10,18 +10,11 @@ namespace LeagueItems
     internal class SpearOfShojin
     {
         public static ItemDef itemDef;
-        public static BuffDef exigencyBuff;
 
-        public static Color32 shojinColor = new Color32(106, 230, 112, 255);
+        // Gain 50% (+50% per stack) of your base damage as bonus cooldown reduction, up to a maximum bonus of 50% CDR.
+        public const float MAX_BONUS_CDR = 50.0f;
 
-        // Gain 25% (+25% per stack) of your base damage as bonus cooldown reduction, up to a maximum bonus of 40%.
-        // Gain up to 15% bonus movement speed based on missing health.
-        public const int MAX_EXIGENCY_STACKS = 15;
-        
-        public const float MAX_BONUS_CDR = 40.0f;
-        public const float MAX_BONUS_MOVESPEED = 15.0f;
-
-        public static float cdrFromDamageNumber = 25.0f;
+        public static float cdrFromDamageNumber = 50.0f;
         public static float cdrFromDamagePercent = cdrFromDamageNumber / 100f;
 
         public static Dictionary<UnityEngine.Networking.NetworkInstanceId, float> bonusCooldownReduction = new Dictionary<UnityEngine.Networking.NetworkInstanceId, float>();
@@ -29,12 +22,10 @@ namespace LeagueItems
         internal static void Init()
         {
             GenerateItem();
-            GenerateBuff();
             AddTokens();
 
             var displayRules = new ItemDisplayRuleDict(null);
             ItemAPI.Add(new CustomItem(itemDef, displayRules));
-            ContentAddition.AddBuffDef(exigencyBuff);
 
             Hooks();
         }
@@ -52,20 +43,18 @@ namespace LeagueItems
 #pragma warning disable Publicizer001
             itemDef._itemTierDef = Addressables.LoadAssetAsync<ItemTierDef>("RoR2/Base/Common/Tier3Def.asset").WaitForCompletion();
 #pragma warning restore Publicizer001
-            itemDef.pickupIconSprite = Assets.loadedIcons ? Assets.icons.LoadAsset<Sprite>("Assets/LeagueItems/SpearOfShojin") : Addressables.LoadAssetAsync<Sprite>("RoR2/Base/Common/MiscIcons/texMysteryIcon.png").WaitForCompletion();
+            itemDef.pickupIconSprite = Addressables.LoadAssetAsync<Sprite>("RoR2/Base/Common/MiscIcons/texMysteryIcon.png").WaitForCompletion();
             itemDef.pickupModelPrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Mystery/PickupMystery.prefab").WaitForCompletion();
             itemDef.canRemove = true;
             itemDef.hidden = false;
         }
 
-        private static void GenerateBuff()
+        public static float CalculateBonusCooldownReduction(CharacterBody sender, float itemCount)
         {
-            exigencyBuff = ScriptableObject.CreateInstance<BuffDef>();
-
-            exigencyBuff.name = "Exigency";
-            exigencyBuff.buffColor = shojinColor;
-            exigencyBuff.iconSprite = Addressables.LoadAssetAsync<Sprite>("RoR2/Base/Common/MiscIcons/texMysteryIcon.png").WaitForCompletion();
-            exigencyBuff.canStack = true;
+            float hyperbolicPercentage = 1 - (1 / (1 + (cdrFromDamagePercent * itemCount)));
+            float bonusCDR = hyperbolicPercentage * sender.damage;
+            // Cap cooldown reduction
+            return bonusCDR > MAX_BONUS_CDR ? MAX_BONUS_CDR : bonusCDR;
         }
 
         private static void Hooks()
@@ -74,22 +63,16 @@ namespace LeagueItems
             {
                 orig(self);
 
-                if (self.inventory.GetItemCount(itemDef) > 0)
+                if (!self || !self.inventory)
                 {
-                    float missingHealth = ((self.maxHealth - self.healthComponent.health) / self.maxHealth) * 100f;
-                    // Scaled 66% missing health to 15% bonus movespeed. 4.4% missing health per 1% bonus movespeed.
-                    int stacksToApply = (int) Math.Floor(missingHealth / 4.4f);
-                    // Cap stacks at 15.
-                    stacksToApply = stacksToApply > MAX_EXIGENCY_STACKS ? MAX_EXIGENCY_STACKS : stacksToApply;
-
-#pragma warning disable Publicizer001 // Accessing a member that was not originally public
-                    self.SetBuffCount(exigencyBuff.buffIndex, stacksToApply);
+                    return;
                 }
 
-                if (self.GetBuffCount(exigencyBuff) > 0)
+                int itemCount = self.inventory.GetItemCount(itemDef);
+                if (itemCount > 0)
                 {
-                    self.SetBuffCount(exigencyBuff.buffIndex, 0);
-#pragma warning restore Publicizer001 // Accessing a member that was not originally public
+                    float bonusCDR = CalculateBonusCooldownReduction(self, itemCount);
+                    Utilities.SetValueInDictionary(ref bonusCooldownReduction, self.master, bonusCDR);
                 }
             };
 
@@ -98,20 +81,13 @@ namespace LeagueItems
                 if (sender.inventory && sender.master)
                 {
                     int itemCount = sender.inventory.GetItemCount(itemDef);
-                    float hyperbolicPercentage = 1 - (1 / (1 + (cdrFromDamagePercent * itemCount)));
 
                     if (itemCount > 0)
                     {
-                        float bonusCDR = hyperbolicPercentage * sender.damage;
-                        // Cap at 40% bonus cooldown reduction
-                        bonusCDR = bonusCDR > MAX_BONUS_CDR ? MAX_BONUS_CDR : bonusCDR;
-
-                        args.cooldownMultAdd -= bonusCDR / 100f;
+                        float bonusCDR = CalculateBonusCooldownReduction(sender, itemCount);
                         Utilities.SetValueInDictionary(ref bonusCooldownReduction, sender.master, bonusCDR);
 
-                        int movespeedStacks = sender.GetBuffCount(exigencyBuff);
-                        // 1% bonus movespeed per stack.
-                        args.moveSpeedMultAdd += movespeedStacks * 0.01f;
+                        args.cooldownMultAdd -= bonusCDR / 100f;
                     }
                 }
             };
@@ -134,16 +110,9 @@ namespace LeagueItems
 
                         if (item.itemIndex == itemDef.itemIndex)
                         {
-                            if (Integrations.itemStatsEnabled)
-                            {
-                                itemDef.descriptionToken += "<br><br>Bonus Cooldown Reduction: " + String.Format("{0:#}%", bonusCDR);
-                            }
-                            else
-                            {
-                                item.tooltipProvider.overrideBodyText =
-                                    Language.GetString(itemDef.descriptionToken)
-                                    + "<br><br>Bonus Cooldown Reduction: " + String.Format("{0:#}%", bonusCDR);
-                            }
+                            item.tooltipProvider.overrideBodyText =
+                                Language.GetString(itemDef.descriptionToken)
+                                + "<br><br>Bonus Cooldown Reduction: " + String.Format("{0:#.#}%", bonusCDR);
                         }
                     });
 #pragma warning restore Publicizer001
@@ -164,12 +133,11 @@ namespace LeagueItems
             LanguageAPI.Add("SoSPickup", "Gain a percentage of your damage as bonus cooldown reduction.");
 
             // The Description is where you put the actual numbers and give an advanced description.
-            LanguageAPI.Add("SoSDesc", "Gain <style=cIsUtility>" + cdrFromDamageNumber + "%</style> <style=cStack>(+" + cdrFromDamageNumber + "%)</style> "
-                                        + "of your base damage as bonus cooldown reduction, up to a maximum bonus of 40%. "
-                                        + "Gain up to 15% bonus movement speed based on missing health.");
+            LanguageAPI.Add("SoSDesc", "Gain <style=cIsUtility>" + cdrFromDamageNumber + "%</style> <style=cStack>(+" + cdrFromDamageNumber + "% per stack)</style> "
+                                        + "of your base damage as bonus cooldown reduction, up to a maximum bonus of <style=cIsUtility>" + MAX_BONUS_CDR + "%</style> CDR.");
 
             // The Lore is, well, flavor. You can write pretty much whatever you want here.
-            LanguageAPI.Add("SoSLore", "A jade spear that once belonged to the Shojin Order of Ionia.");
+            LanguageAPI.Add("SoSLore", "A jade spear.");
         }
     }
 }

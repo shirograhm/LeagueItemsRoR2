@@ -43,10 +43,16 @@ namespace LeagueItems
 #pragma warning disable Publicizer001
             itemDef._itemTierDef = Addressables.LoadAssetAsync<ItemTierDef>("RoR2/Base/Common/Tier3Def.asset").WaitForCompletion();
 #pragma warning restore Publicizer001
-            itemDef.pickupIconSprite = Assets.loadedIcons ? Assets.icons.LoadAsset<Sprite>("Assets/LeagueItems/TitanicHydra") : Addressables.LoadAssetAsync<Sprite>("RoR2/Base/Common/MiscIcons/texMysteryIcon.png").WaitForCompletion();
+            itemDef.pickupIconSprite = Addressables.LoadAssetAsync<Sprite>("RoR2/Base/Common/MiscIcons/texMysteryIcon.png").WaitForCompletion();
             itemDef.pickupModelPrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Mystery/PickupMystery.prefab").WaitForCompletion();
             itemDef.canRemove = true;
             itemDef.hidden = false;
+        }
+
+        public static float CalculateBonusBaseDamage(CharacterBody sender, float itemCount)
+        {
+            float baseMaxHealth = sender.healthComponent.fullHealth;
+            return (firstStackBonusPercent + extraStackBonusPercent * (itemCount - 1)) * baseMaxHealth;
         }
 
         private static void Hooks()
@@ -54,23 +60,16 @@ namespace LeagueItems
             On.RoR2.CharacterBody.FixedUpdate += (orig, self) =>
             {
                 orig(self);
-                if (Integrations.itemStatsEnabled)
-                {
-                    // Let other mods handle stat tracking if installed
-                    return;
-                }
 
-                if (!self.inventory)
+                if (!self || !self.inventory)
                 {
                     return;
                 }
 
                 int itemCount = self.inventory.GetItemCount(itemDef);
-                int extraCount = itemCount - 1;
-
                 if (itemCount > 0)
                 {
-                    float bonusBaseDamage = (firstStackBonusPercent + extraStackBonusPercent * extraCount) * self.maxHealth;
+                    float bonusBaseDamage = CalculateBonusBaseDamage(self, itemCount);
                     Utilities.SetValueInDictionary(ref currentBonusBaseDamage, self.master, bonusBaseDamage);
                 }
             };
@@ -84,7 +83,7 @@ namespace LeagueItems
 
                     if (itemCount > 0)
                     {
-                        float bonusBaseDamage = (firstStackBonusPercent + extraStackBonusPercent * extraCount) * sender.maxHealth;
+                        float bonusBaseDamage = CalculateBonusBaseDamage(sender, itemCount);
                         Utilities.SetValueInDictionary(ref currentBonusBaseDamage, sender.master, bonusBaseDamage);
 
                         args.baseDamageAdd += bonusBaseDamage;
@@ -112,16 +111,9 @@ namespace LeagueItems
 
                         if (item.itemIndex == itemDef.itemIndex)
                         {
-                            if (Integrations.itemStatsEnabled)
-                            {
-                                itemDef.descriptionToken += "<br><br>Total Bonus Base Damage: " + valueBaseDamageText;
-                            }
-                            else
-                            {
-                                item.tooltipProvider.overrideBodyText =
-                                    Language.GetString(itemDef.descriptionToken)
-                                    + "<br><br>Total Bonus Base Damage: " + valueBaseDamageText;
-                            }
+                            item.tooltipProvider.overrideBodyText =
+                                Language.GetString(itemDef.descriptionToken)
+                                + "<br><br>Total Bonus Base Damage: " + valueBaseDamageText;
                         }
                     });
 #pragma warning restore Publicizer001
@@ -140,9 +132,9 @@ namespace LeagueItems
 
             // The Pickup is the short text that appears when you first pick this up. This text should be short and to the point, numbers are generally ommited.
             LanguageAPI.Add("THPickup", "Increase base damage by a percentage of your max health.");
-            
+
             // The Description is where you put the actual numbers and give an advanced description.
-            LanguageAPI.Add("THDesc", "Increase base damage by <style=cIsHealth>" + firstStackBonusNumber + "%</style> <style=cStack>(+" + extraStackBonusNumber + "%)</style> of max health.");
+            LanguageAPI.Add("THDesc", "Increase base damage by <style=cIsHealth>" + firstStackBonusNumber + "%</style> <style=cStack>(+" + extraStackBonusNumber + "% per stack)</style> of max health.");
 
             // The Lore is, well, flavor. You can write pretty much whatever you want here.
             LanguageAPI.Add("THLore", "A large weapon.");

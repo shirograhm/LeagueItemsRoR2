@@ -15,11 +15,11 @@ namespace LeagueItems
 
         public static Color32 deadmansColor = new Color32(230, 92, 0, 255);
 
-        // Gain a stack of Momentum every second, up to 10 stacks. Each stack gives 5% movement speed.
+        // Gain a stack of Momentum every second, up to 10 stacks. Each stack gives 3% movement speed.
         // Once fully stacked, expend all stacks to deal 300% (+300% per item stack) bonus on-hit damage.
         public const int MAX_MOMENTUM_STACKS = 10;
 
-        public static float movementSpeedPerStack = 5.0f;
+        public static float movementSpeedPerStack = 3.0f;
         public static float movementSpeedPerStackPercent = movementSpeedPerStack / 100f;
 
         public static float bonusDamagePerItemStack = 300.0f;
@@ -61,7 +61,7 @@ namespace LeagueItems
 #pragma warning disable Publicizer001
             itemDef._itemTierDef = Addressables.LoadAssetAsync<ItemTierDef>("RoR2/Base/Common/Tier3Def.asset").WaitForCompletion();
 #pragma warning restore Publicizer001
-            itemDef.pickupIconSprite = Assets.loadedIcons ? Assets.icons.LoadAsset<Sprite>("Assets/LeagueItems/DeadMansPlate") : Addressables.LoadAssetAsync<Sprite>("RoR2/Base/Common/MiscIcons/texMysteryIcon.png").WaitForCompletion();
+            itemDef.pickupIconSprite = Addressables.LoadAssetAsync<Sprite>("RoR2/Base/Common/MiscIcons/texMysteryIcon.png").WaitForCompletion();
             itemDef.pickupModelPrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Mystery/PickupMystery.prefab").WaitForCompletion();
             itemDef.canRemove = true;
             itemDef.hidden = false;
@@ -77,11 +77,23 @@ namespace LeagueItems
             momentumBuff.canStack = true;
         }
 
+        public static void CalculateDamageProc(CharacterBody sender, float itemCount)
+        {
+            float damageProc = sender.damage * bonusDamagePerItemStackPercent * itemCount;
+
+            Utilities.SetValueInDictionary(ref currentDamageProc, sender.master, damageProc);
+        }
+
         private static void Hooks()
         {
             On.RoR2.CharacterBody.FixedUpdate += (orig, self) =>
             {
                 orig(self);
+
+                if (!self || !self.inventory)
+                {
+                    return;
+                }
 
                 if (self.inventory.GetItemCount(itemDef) > 0)
                 {
@@ -113,8 +125,7 @@ namespace LeagueItems
 
                     if (itemCount > 0)
                     {
-                        float damageProc = sender.damage * bonusDamagePerItemStackPercent * itemCount;
-                        Utilities.SetValueInDictionary(ref currentDamageProc, sender.master, damageProc);
+                        CalculateDamageProc(sender, itemCount);
 
                         int numStacks = sender.GetBuffCount(momentumBuff);
                         args.moveSpeedMultAdd += numStacks * movementSpeedPerStackPercent;
@@ -140,7 +151,8 @@ namespace LeagueItems
 
                     if (itemCount > 0 && attackerBody.GetBuffCount(momentumBuff) == MAX_MOMENTUM_STACKS)
                     {
-                        float deadMansDamage = attackerBody.damage * bonusDamagePerItemStackPercent * damageInfo.procCoefficient * itemCount;
+                        float damageProc = currentDamageProc.TryGetValue(attackerBody.master.netId, out float _) ? currentDamageProc[attackerBody.master.netId] : 0f;
+                        float deadMansDamage = damageInfo.procCoefficient * damageProc;
 
                         DamageInfo deadMansProc = new DamageInfo();
                         deadMansProc.damage = deadMansDamage;
@@ -188,17 +200,10 @@ namespace LeagueItems
 
                         if (item.itemIndex == itemDef.itemIndex)
                         {
-                            if (Integrations.itemStatsEnabled)
-                            {
-                                itemDef.descriptionToken += "<br><br>Proc Damage: " + valueProcText + "<br>Total Damage Dealt: " + valueDamageText;
-                            }
-                            else
-                            {
-                                item.tooltipProvider.overrideBodyText =
-                                    Language.GetString(itemDef.descriptionToken)
-                                    + "<br><br>Proc Damage: " + valueProcText
-                                    + "<br>Total Damage Dealt: " + valueDamageText;
-                            }
+                            item.tooltipProvider.overrideBodyText =
+                                Language.GetString(itemDef.descriptionToken)
+                                + "<br><br>Proc Damage: " + valueProcText
+                                + "<br>Total Damage Dealt: " + valueDamageText;
                         }
                     });
 #pragma warning restore Publicizer001
@@ -220,7 +225,7 @@ namespace LeagueItems
 
             // The Description is where you put the actual numbers and give an advanced description.
             LanguageAPI.Add("DMPDesc", "Gain a stack of Momentum every second, up to a maximum of <style=cIsUtility>" + MAX_MOMENTUM_STACKS + "</style>. Each stack gives <style=cIsUtility>" + movementSpeedPerStack + "%</style> movement speed. "
-                                        + "Once fully stacked, expend all stacks to deal <style=cIsDamage>" + bonusDamagePerItemStack + "%</style> <style=cStack>(+" + bonusDamagePerItemStack + "%)</style> bonus on-hit damage.");
+                                        + "Once fully stacked, expend all stacks to deal <style=cIsDamage>" + bonusDamagePerItemStack + "%</style> <style=cStack>(+" + bonusDamagePerItemStack + "% per stack)</style> bonus on-hit damage.");
 
             // The Lore is, well, flavor. You can write pretty much whatever you want here.
             LanguageAPI.Add("DMPLore", "The plate armor of a dead man.");

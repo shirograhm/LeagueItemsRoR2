@@ -51,7 +51,7 @@ namespace LeagueItems
 #pragma warning disable Publicizer001
             itemDef._itemTierDef = Addressables.LoadAssetAsync<ItemTierDef>("RoR2/Base/Common/Tier3Def.asset").WaitForCompletion();
 #pragma warning restore Publicizer001
-            itemDef.pickupIconSprite = Assets.loadedIcons ? Assets.icons.LoadAsset<Sprite>("Assets/LeagueItems/BotRK") : Addressables.LoadAssetAsync<Sprite>("RoR2/Base/Common/MiscIcons/texMysteryIcon.png").WaitForCompletion();
+            itemDef.pickupIconSprite = LeagueItemsPlugin.MainAssets.LoadAsset<Sprite>("BladeOfTheRuinedKing.png");
             itemDef.pickupModelPrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Mystery/PickupMystery.prefab").WaitForCompletion();
             itemDef.canRemove = true;
             itemDef.hidden = false;
@@ -73,7 +73,7 @@ namespace LeagueItems
 
                 if (attackerBody?.inventory)
                 {
-                    int itemCount = attackerBody.inventory.GetItemCount(itemDef.itemIndex);
+                    int itemCount = attackerBody.inventory.GetItemCount(itemDef);
                     // Calculate scaled percentage value based on hyperbolic curve
                     float hyperbolicPercentage = 1 - (1 / (1 + (onHitDamagePercent * itemCount)));
 
@@ -121,16 +121,9 @@ namespace LeagueItems
 
                         if (item.itemIndex == itemDef.itemIndex)
                         {
-                            if (Integrations.itemStatsEnabled)
-                            {
-                                itemDef.descriptionToken += "<br><br>Total Damage Done: " + valueDamageText;
-                            }
-                            else
-                            {
-                                item.tooltipProvider.overrideBodyText =
-                                    Language.GetString(itemDef.descriptionToken)
-                                    + "<br><br>Total Damage Done: " + valueDamageText;
-                            }
+                            item.tooltipProvider.overrideBodyText =
+                                Language.GetString(itemDef.descriptionToken)
+                                + "<br><br>Total Damage Done: " + valueDamageText;
                         }
                     });
 #pragma warning restore Publicizer001
@@ -149,9 +142,9 @@ namespace LeagueItems
 
             // The Pickup is the short text that appears when you first pick this up. This text should be short and to the point, numbers are generally ommited.
             LanguageAPI.Add("BotrkPickup", "Deal a percentage of enemies current health as bonus damage on-hit.");
-            
+
             // The Description is where you put the actual numbers and give an advanced description.
-            LanguageAPI.Add("BotrkDesc", "Deal <style=cIsDamage>" + onHitDamageNumber + "%</style> <style=cStack>(+" + onHitDamageNumber + "%)</style> of enemy current health as bonus damage on-hit. Deals a minimum of 1 damage on-hit.");
+            LanguageAPI.Add("BotrkDesc", "Deal <style=cIsDamage>" + onHitDamageNumber + "%</style> <style=cStack>(+" + onHitDamageNumber + "% per stack)</style> of enemy current health as bonus damage on-hit. Deals a minimum of 1 damage on-hit.");
 
             // The Lore is, well, flavor. You can write pretty much whatever you want here.
             LanguageAPI.Add("BotrkLore", "A sword belonging to the Shadow Isles.");

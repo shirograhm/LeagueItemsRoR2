@@ -3,6 +3,7 @@ using R2API;
 using RoR2;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using System.Reflection;
 
 namespace LeagueItems
 {
@@ -19,7 +20,9 @@ namespace LeagueItems
         public const string PluginName = "LeagueItems";
         public const string PluginVersion = "0.1.0";
 
-        public static PluginInfo pInfo { get; private set; }
+        public static PluginInfo PInfo { get; private set; }
+
+        public static AssetBundle MainAssets;
 
         internal static BepInEx.Logging.ManualLogSource logger;
 
@@ -27,8 +30,21 @@ namespace LeagueItems
         {
             logger = Logger;
 
-            pInfo = Info;
-            Assets.Init();
+            PInfo = Info;
+            using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("LeagueItems.assetbundle"))
+            {
+                if (stream != null)
+                {
+                    MainAssets = AssetBundle.LoadFromStream(stream);
+
+                    logger.LogMessage("Successfully loaded assets.");
+                }
+                else
+                {
+                    logger.LogError("ERROR: Assets failed to load.");
+                }
+            }
+
             DamageColorAPI.Init();
 
             RoR2.ItemCatalog.availability.CallWhenAvailable(Integrations.Init);
@@ -36,6 +52,7 @@ namespace LeagueItems
             BladeOfTheRuinedKing.Init();
             Bloodthirster.Init();
             DeadMansPlate.Init();
+            Heartsteel.Init();
             NashorsTooth.Init();
             SpearOfShojin.Init();
             TitanicHydra.Init();
@@ -58,6 +75,7 @@ namespace LeagueItems
                 PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(BladeOfTheRuinedKing.itemDef.itemIndex), transform.position, transform.forward * 20f);
                 PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(Bloodthirster.itemDef.itemIndex), transform.position, transform.forward * 20f);
                 PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(DeadMansPlate.itemDef.itemIndex), transform.position, transform.forward * 20f);
+                PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(Heartsteel.itemDef.itemIndex), transform.position, transform.forward * 20f);
                 PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(NashorsTooth.itemDef.itemIndex), transform.position, transform.forward * 20f);
                 PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(SpearOfShojin.itemDef.itemIndex), transform.position, transform.forward * 20f);
                 PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(TitanicHydra.itemDef.itemIndex), transform.position, transform.forward * 20f);

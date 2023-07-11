@@ -48,10 +48,15 @@ namespace LeagueItems
 #pragma warning disable Publicizer001
             itemDef._itemTierDef = Addressables.LoadAssetAsync<ItemTierDef>("RoR2/Base/Common/Tier3Def.asset").WaitForCompletion();
 #pragma warning restore Publicizer001
-            itemDef.pickupIconSprite = Assets.loadedIcons ? Assets.icons.LoadAsset<Sprite>("Assets/LeagueItems/NashorsTooth") : Addressables.LoadAssetAsync<Sprite>("RoR2/Base/Common/MiscIcons/texMysteryIcon.png").WaitForCompletion();
+            itemDef.pickupIconSprite = Addressables.LoadAssetAsync<Sprite>("RoR2/Base/Common/MiscIcons/texMysteryIcon.png").WaitForCompletion();
             itemDef.pickupModelPrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Mystery/PickupMystery.prefab").WaitForCompletion();
             itemDef.canRemove = true;
             itemDef.hidden = false;
+        }
+
+        public static float CalculateDamageOnHit(CharacterBody sender, float itemCount)
+        {
+            return onHitDamageAmount * sender.level * itemCount;
         }
 
         private static void Hooks()
@@ -59,23 +64,17 @@ namespace LeagueItems
             On.RoR2.CharacterBody.FixedUpdate += (orig, self) =>
             {
                 orig(self);
-                if (Integrations.itemStatsEnabled)
-                {
-                    // Let other mods handle stat tracking if installed
-                    return;
-                }
 
-                if (!self.inventory)
+                if (!self || !self.inventory)
                 {
                     return;
                 }
 
                 int itemCount = self.inventory.GetItemCount(itemDef);
-
                 if (itemCount > 0)
                 {
-                    float currentOnHitDamageCalculated = itemCount * onHitDamageAmount * self.level;
-                    Utilities.SetValueInDictionary(ref cumOnHitDamage, self.master, currentOnHitDamageCalculated);
+                    float damageOnHit = CalculateDamageOnHit(self, itemCount);
+                    Utilities.SetValueInDictionary(ref cumOnHitDamage, self.master, damageOnHit);
                 }
             };
 
@@ -94,10 +93,11 @@ namespace LeagueItems
                 if (attackerBody?.inventory)
                 {
                     int itemCount = attackerBody.inventory.GetItemCount(itemDef.itemIndex);
-
+                    // If the item is in the inventory and the on-hit multiplier is greater than 0
                     if (itemCount > 0 && damageInfo.procCoefficient > 0)
                     {
-                        float nashorsDamage = damageInfo.procCoefficient * itemCount * onHitDamageAmount * attackerBody.level;
+                        float damageOnHit = cumOnHitDamage.TryGetValue(attackerBody.master.netId, out float _) ? cumOnHitDamage[attackerBody.master.netId] : 0f;
+                        float nashorsDamage = damageInfo.procCoefficient * damageOnHit;
 
                         DamageInfo nashorsProc = new DamageInfo();
                         nashorsProc.damage = nashorsDamage;
@@ -139,17 +139,10 @@ namespace LeagueItems
 
                         if (item.itemIndex == itemDef.itemIndex)
                         {
-                            if (Integrations.itemStatsEnabled)
-                            {
-                                itemDef.descriptionToken += "<br><br>On Hit Damage: " + valueOnHit + "<br>Total Damage Done: " + valueDamageText;
-                            }
-                            else
-                            {
-                                item.tooltipProvider.overrideBodyText =
-                                    Language.GetString(itemDef.descriptionToken)
-                                    + "<br><br>On Hit Damage: " + valueOnHit
-                                    + "<br>Total Damage Done: " + valueDamageText;
-                            }
+                            item.tooltipProvider.overrideBodyText =
+                                Language.GetString(itemDef.descriptionToken)
+                                + "<br><br>On Hit Damage: " + valueOnHit
+                                + "<br>Total Damage Done: " + valueDamageText;
                         }
                     });
 #pragma warning restore Publicizer001

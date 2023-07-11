@@ -14,6 +14,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="assetbundle" />
+    <None Remove="LeagueItems" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="assetbundle" />
+    <EmbeddedResource Include="LeagueItems" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="BepInEx.Analyzers" Version="1.0.8">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
