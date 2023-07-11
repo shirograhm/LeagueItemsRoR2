@@ -11,8 +11,8 @@ namespace LeagueItems
     {
         public static ItemDef itemDef;
 
-        // Upon killing an elite enemy, gain 3% (+3% per stack) of their max health as permanent base health.
-        public static float heartsteelValuePerStack = 3f;
+        // Upon killing an elite enemy, gain 1% (+1% per stack) of their max health as permanent base health.
+        public static float heartsteelValuePerStack = 1f;
         public static float heartsteelValuePerStackPercentage = heartsteelValuePerStack / 100f;
 
         public static Dictionary<UnityEngine.Networking.NetworkInstanceId, float> totalHealthGained = new Dictionary<UnityEngine.Networking.NetworkInstanceId, float>();

@@ -11,8 +11,8 @@ namespace LeagueItems
     {
         public static ItemDef itemDef;
 
-        // Heal for 20% of damage dealt on-hit.
-        public static float bonusLifestealNumber = 20f;
+        // Heal for 10% of damage dealt on-hit.
+        public static float bonusLifestealNumber = 10f;
         public static float bonusLifestealPercent = bonusLifestealNumber / 100f;
 
         public static Dictionary<UnityEngine.Networking.NetworkInstanceId, float> totalHealingDone = new Dictionary<UnityEngine.Networking.NetworkInstanceId, float>();

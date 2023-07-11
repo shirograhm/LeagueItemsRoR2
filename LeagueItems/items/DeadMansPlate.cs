@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using R2API;
+using R2API.Networking;
+using R2API.Networking.Interfaces;
 using RoR2;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
-
+using UnityEngine.Networking;
 
 namespace LeagueItems
 {
@@ -33,8 +35,66 @@ namespace LeagueItems
         public static Dictionary<UnityEngine.Networking.NetworkInstanceId, float> currentDamageProc = new Dictionary<UnityEngine.Networking.NetworkInstanceId, float>();
         public static Dictionary<UnityEngine.Networking.NetworkInstanceId, float> totalDamageDealt = new Dictionary<UnityEngine.Networking.NetworkInstanceId, float>();
 
+        public class DeadMansStatistics : MonoBehaviour
+        {
+            private float _totalDamageDealt;
+            public float totalDamageDealt
+            {
+                get { return _totalDamageDealt; }
+                set {
+                    _totalDamageDealt = value;
+                    if (NetworkServer.active)
+                    {
+                        new Sync(gameObject.GetComponent<NetworkIdentity>().netId, value).Send(NetworkDestination.Clients);
+                    }
+                }
+            }
+
+            public class Sync : INetMessage
+            {
+                NetworkInstanceId objId;
+                float totalDamageDealt;
+
+                public Sync()
+                {
+                }
+
+                public Sync(NetworkInstanceId objId, float totalDamageDealt)
+                {
+                    this.objId = objId;
+                    this.totalDamageDealt = totalDamageDealt;
+                }
+
+                public void Deserialize(NetworkReader reader)
+                {
+                    objId = reader.ReadNetworkId();
+                    totalDamageDealt = reader.ReadSingle();
+                }
+
+                public void OnReceived()
+                {
+                    if (NetworkServer.active) return;
+
+                    GameObject obj = Util.FindNetworkObject(objId);
+                    if(obj)
+                    {
+                        DeadMansStatistics component = obj.GetComponent<DeadMansStatistics>();
+                        if (component) component.totalDamageDealt = totalDamageDealt;
+                    }
+                }
+
+                public void Serialize(NetworkWriter writer)
+                {
+                    writer.Write(objId);
+                    writer.Write(totalDamageDealt);
+                }
+            }
+        }
+
         internal static void Init()
         {
+            NetworkingAPI.RegisterMessageType<DeadMansStatistics.Sync>();
+
             GenerateItem();
             GenerateBuff();
             AddTokens();
@@ -77,11 +137,9 @@ namespace LeagueItems
             momentumBuff.canStack = true;
         }
 
-        public static void CalculateDamageProc(CharacterBody sender, float itemCount)
+        public static float CalculateDamageProc(CharacterBody sender, float itemCount)
         {
-            float damageProc = sender.damage * bonusDamagePerItemStackPercent * itemCount;
-
-            Utilities.SetValueInDictionary(ref currentDamageProc, sender.master, damageProc);
+            return sender.damage * bonusDamagePerItemStackPercent * itemCount;
         }
 
         private static void Hooks()
@@ -125,7 +183,8 @@ namespace LeagueItems
 
                     if (itemCount > 0)
                     {
-                        CalculateDamageProc(sender, itemCount);
+                        float damageProc = CalculateDamageProc(sender, itemCount);
+                        Utilities.SetValueInDictionary(ref currentDamageProc, sender.master, damageProc);
 
                         int numStacks = sender.GetBuffCount(momentumBuff);
                         args.moveSpeedMultAdd += numStacks * movementSpeedPerStackPercent;

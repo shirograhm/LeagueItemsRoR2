@@ -16,8 +16,8 @@ namespace LeagueItems
 
         public static Color32 botrkColor = new Color32(40, 179, 191, 255);
 
-        // Deals 2% (+2% per stack) current health damage on-hit.
-        public static float onHitDamageNumber = 2.0f;
+        // Deals 1.5% (+1.5% per stack) current health damage on-hit.
+        public static float onHitDamageNumber = 1.5f;
         public static float onHitDamagePercent = onHitDamageNumber / 100f;
 
         private static DamageAPI.ModdedDamageType botrkDamageType;

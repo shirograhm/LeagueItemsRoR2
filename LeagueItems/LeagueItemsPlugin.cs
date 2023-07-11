@@ -20,6 +20,8 @@ namespace LeagueItems
         public const string PluginName = "LeagueItems";
         public const string PluginVersion = "0.1.0";
 
+        public static bool givenStarterPack = false;
+
         public static PluginInfo PInfo { get; private set; }
 
         public static AssetBundle MainAssets;
@@ -65,7 +67,7 @@ namespace LeagueItems
         private void Update()
         {
             // This if statement checks if the player has currently pressed F2.
-            if (Input.GetKeyDown(KeyCode.F2))
+            if (Input.GetKeyDown(KeyCode.F2) && !givenStarterPack)
             {
                 // Get the player body to use a position:
                 var transform = PlayerCharacterMasterController.instances[0].master.GetBodyObject().transform;
