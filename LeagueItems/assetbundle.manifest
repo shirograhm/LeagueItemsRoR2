@@ -1,34 +1,30 @@
 ManifestFileVersion: 0
-CRC: 3863404523
+CRC: 468433301
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 8bc3a4a72cd92dc00a03308c81deb6a9
+    Hash: 0bbe18fffa7ccaab5063527553057538
   TypeTreeHash:
     serializedVersion: 2
-    Hash: 21747e4ee48f36c7a65f9afbfd77f392
+    Hash: 011d1bb1b97750065fc8e33fbaec9bad
 HashAppended: 0
 ClassTypes:
-- Class: 1
-  Script: {instanceID: 0}
-- Class: 4
-  Script: {instanceID: 0}
 - Class: 21
   Script: {instanceID: 0}
-- Class: 23
-  Script: {instanceID: 0}
 - Class: 28
-  Script: {instanceID: 0}
-- Class: 33
-  Script: {instanceID: 0}
-- Class: 43
   Script: {instanceID: 0}
 - Class: 48
   Script: {instanceID: 0}
 - Class: 213
   Script: {instanceID: 0}
 Assets:
-- Assets/Textures/Icons/Item/Orb/BladeOfTheRuinedKing.png
-- Assets/Models/Prefabs/Item/Orb/Orb.prefab
-- Assets/Materials/Item/Orb/OrbMaterial.mat
+- Assets/Textures/Icons/Item/Bloodthirster/Bloodthirster.png
+- Assets/Materials/Item/BotRK/BotRKMaterial.mat
+- Assets/Textures/Icons/Item/SpearOfShojin/SpearofShojin.png
+- Assets/Textures/Icons/Item/NashorsTooth/NashorsTooth.png
+- Assets/Textures/Icons/Item/BotRK/BotRK.png
+- Assets/Textures/Icons/Item/TitanicHydra/TitanicHydra.png
+- Assets/Textures/Icons/Item/DeadMansPlate/DeadMansPlate.png
+- Assets/Textures/Icons/Item/WarmogsArmor/WarmogsArmor.png
+- Assets/Textures/Icons/Item/Heartsteel/Heartsteel.png
 Dependencies: []
