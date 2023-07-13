@@ -3,6 +3,7 @@ using R2API;
 using RoR2;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using System;
 using System.Reflection;
 
 namespace LeagueItems
@@ -18,9 +19,7 @@ namespace LeagueItems
     {
         public const string PluginGUID = "com.shirograhm.leagueitems";
         public const string PluginName = "LeagueItems";
-        public const string PluginVersion = "0.1.0";
-
-        public static bool givenStarterPack = false;
+        public const string PluginVersion = "0.1.1";
 
         public static PluginInfo PInfo { get; private set; }
 
@@ -55,6 +54,7 @@ namespace LeagueItems
             Bloodthirster.Init();
             DeadMansPlate.Init();
             Heartsteel.Init();
+            InfinityEdge.Init();
             NashorsTooth.Init();
             SpearOfShojin.Init();
             TitanicHydra.Init();
@@ -67,21 +67,38 @@ namespace LeagueItems
         private void Update()
         {
             // This if statement checks if the player has currently pressed F2.
-            if (Input.GetKeyDown(KeyCode.F2) && !givenStarterPack)
+            if (Input.GetKeyDown(KeyCode.F2))
             {
                 // Get the player body to use a position:
                 var transform = PlayerCharacterMasterController.instances[0].master.GetBodyObject().transform;
 
                 // And then drop our defined item in front of the player.
                 logger.LogMessage($"Player pressed F2. Spawning our custom item at coordinates {transform.position}.");
-                PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(BladeOfTheRuinedKing.itemDef.itemIndex), transform.position, transform.forward * 20f);
-                PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(Bloodthirster.itemDef.itemIndex), transform.position, transform.forward * 20f);
-                PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(DeadMansPlate.itemDef.itemIndex), transform.position, transform.forward * 20f);
-                PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(Heartsteel.itemDef.itemIndex), transform.position, transform.forward * 20f);
-                PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(NashorsTooth.itemDef.itemIndex), transform.position, transform.forward * 20f);
-                PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(SpearOfShojin.itemDef.itemIndex), transform.position, transform.forward * 20f);
-                PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(TitanicHydra.itemDef.itemIndex), transform.position, transform.forward * 20f);
-                PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(WarmogsArmor.itemDef.itemIndex), transform.position, transform.forward * 20f);
+
+                // Red Item Array
+                ItemIndex[] redItems = new ItemIndex[]
+                {
+                    BladeOfTheRuinedKing.itemDef.itemIndex,
+                    Bloodthirster.itemDef.itemIndex,
+                    DeadMansPlate.itemDef.itemIndex,
+                    Heartsteel.itemDef.itemIndex,
+                    NashorsTooth.itemDef.itemIndex,
+                    SpearOfShojin.itemDef.itemIndex,
+                    TitanicHydra.itemDef.itemIndex,
+                    WarmogsArmor.itemDef.itemIndex
+                };
+                // Green Item Array
+                ItemIndex[] greenItems = new ItemIndex[]
+                {
+                    InfinityEdge.itemDef.itemIndex
+                };
+
+                var random = new System.Random();
+                int redArrayIdx = random.Next(0, redItems.Length);
+                int greenArrayIdx = random.Next(0, greenItems.Length);
+
+                PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(redItems[redArrayIdx]), transform.position, transform.forward * 20f);
+                PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(greenItems[greenArrayIdx]), transform.position, transform.forward * 20f);
             }
         }
     }

@@ -14,10 +14,10 @@ namespace LeagueItems
     {
         public static ItemDef itemDef;
 
-        // Gain 100% (+50% per stack) of your base health as bonus health.
-        public static float firstStackIncreaseNumber = 100f;
+        // Gain 50% (+25% per stack) of your base health as bonus health.
+        public static float firstStackIncreaseNumber = 50f;
         public static float firstStackIncreasePercent = firstStackIncreaseNumber / 100f;
-        public static float extraStackIncreaseNumber = 50f;
+        public static float extraStackIncreaseNumber = 25f;
         public static float extraStackIncreasePercent = extraStackIncreaseNumber / 100f;
 
         internal static void Init()
@@ -59,7 +59,7 @@ namespace LeagueItems
         {
             float bonusesFromOtherItems = 0;
             // Add all base health bonuses from other items here
-            if (sender.master.inventory.GetItemCount(Heartsteel.itemDef) > 0)
+            if (sender.master.inventory && sender.master.inventory.GetItemCount(Heartsteel.itemDef) > 0)
             {
                 // If the player has a Heartsteel in their inventory, we add the heartsteel bonus to the Warmog's calculation
                 var itemStats = sender.inventory.GetComponent<Heartsteel.HeartsteelStatistics>();

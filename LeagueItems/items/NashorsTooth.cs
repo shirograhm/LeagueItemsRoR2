@@ -14,10 +14,12 @@ namespace LeagueItems
     {
         public static ItemDef itemDef;
 
-        public static Color32 nashorsColor = new Color32(176, 26, 94, 255);
+        public static Color32 nashorsColor = new Color32(191, 10, 137, 255);
 
-        // Deals 2 (+2 per stack) damage per level on-hit.
-        public static float onHitDamageAmount = 2f;
+        // Deals 5 ((+1 per stack) +0.5 per level) damage on-hit.
+        public static float firstStackMultiplier = 5f;
+        public static float extraStacksMultiplier = 1f;
+        public static float levelDamageMultiplier = 0.5f;
 
         public static DamageAPI.ModdedDamageType nashorsDamageType;
         public static DamageColorIndex nashorsDamageColor = DamageColorAPI.RegisterDamageColor(nashorsColor);
@@ -116,7 +118,7 @@ namespace LeagueItems
 
         public static float CalculateDamageOnHit(CharacterBody sender, float itemCount)
         {
-            return onHitDamageAmount * sender.level * itemCount;
+            return firstStackMultiplier + extraStacksMultiplier * (itemCount - 1) + levelDamageMultiplier * sender.level;
         }
 
         private static void Hooks()
@@ -193,7 +195,7 @@ namespace LeagueItems
 
                             float damageOnHit = CalculateDamageOnHit(characterMaster.GetBody(), itemCount);
 
-                            string valueOnHit = String.Format("{0:#}", damageOnHit);
+                            string valueOnHit = String.Format("{0:#.#}", damageOnHit);
                             string valueDamageText = String.Format("{0:#}", itemStats.TotalDamageDealt);
 
                             if (item.itemIndex == itemDef.itemIndex)
@@ -223,7 +225,8 @@ namespace LeagueItems
             LanguageAPI.Add("NTPickup", "Deal flat damage on-hit.");
 
             // The Description is where you put the actual numbers and give an advanced description.
-            LanguageAPI.Add("NTDesc", "Deal <style=cIsDamage>" + onHitDamageAmount + "</style> <style=cStack>(+" + onHitDamageAmount + " per stack)</style> per level on-hit.");
+            LanguageAPI.Add("NTDesc", "Deal <style=cIsDamage>" + firstStackMultiplier + "</style> (<style=cStack>(+" + extraStacksMultiplier + " per stack)</style> "
+                                       + "+<style=cStack>" + levelDamageMultiplier + "</style> per level) damage on-hit.");
 
             // The Lore is, well, flavor. You can write pretty much whatever you want here.
             LanguageAPI.Add("NTLore", "A sword belonging to the Shadow Isles.");

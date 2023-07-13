@@ -51,8 +51,7 @@ namespace LeagueItems
                     "Total Damage Dealt",
                     1f,
                     1f,
-                    statFormatter: BotrkTotalFormatter,
-                    itemTag: BetterUI.ItemStats.ItemTag.Damage
+                    statFormatter: BotrkTotalFormatter
                 );
                 // Dead Man's Plate
                 BetterUI.ItemStats.RegisterStat(
@@ -69,13 +68,12 @@ namespace LeagueItems
                     "Total Damage Dealt",
                     1f,
                     1f,
-                    statFormatter: DeadMansTotalFormatter,
-                    itemTag: BetterUI.ItemStats.ItemTag.Damage
+                    statFormatter: DeadMansTotalFormatter
                 );
                 // Heartsteel
                 BetterUI.ItemStats.RegisterStat(
                     itemDef: Heartsteel.itemDef,
-                    "Health Stolen From Elite Enemies: ",
+                    "Health Gain On Proc",
                     Heartsteel.firstStackIncreasePercent,
                     Heartsteel.extraStackIncreasePercent,
                     stackingFormula: BetterUI.ItemStats.LinearStacking,
@@ -87,8 +85,27 @@ namespace LeagueItems
                     "Total Bonus Health",
                     1f,
                     1f,
-                    statFormatter: HeartsteelFormatter,
+                    statFormatter: HeartsteelTotalFormatter,
                     itemTag: BetterUI.ItemStats.ItemTag.MaxHealth
+                );
+                // InfinityEdge
+                BetterUI.ItemStats.RegisterStat(
+                    itemDef: InfinityEdge.itemDef,
+                    "Bonus Crit Chance",
+                    InfinityEdge.critChanceIncreasePercent,
+                    InfinityEdge.critChanceIncreasePercent,
+                    stackingFormula: BetterUI.ItemStats.LinearStacking,
+                    statFormatter: BetterUI.ItemStats.StatFormatter.Percent,
+                    itemTag: BetterUI.ItemStats.ItemTag.Luck
+                );
+                BetterUI.ItemStats.RegisterStat(
+                    itemDef: InfinityEdge.itemDef,
+                    "Bonus Crit Damage",
+                    InfinityEdge.critDamageIncreasePercent,
+                    InfinityEdge.critDamageIncreasePercent,
+                    stackingFormula: BetterUI.ItemStats.LinearStacking,
+                    statFormatter: BetterUI.ItemStats.StatFormatter.Percent,
+                    itemTag: BetterUI.ItemStats.ItemTag.Luck
                 );
                 // Nashor's Tooth
                 BetterUI.ItemStats.RegisterStat(
@@ -104,8 +121,7 @@ namespace LeagueItems
                     "Total Damage Dealt",
                     1f,
                     1f,
-                    statFormatter: NashorsTotalFormatter,
-                    itemTag: BetterUI.ItemStats.ItemTag.Damage
+                    statFormatter: NashorsTotalFormatter
                 );
                 // Spear Of Shojin
                 BetterUI.ItemStats.RegisterStat(
@@ -122,8 +138,7 @@ namespace LeagueItems
                     "Bonus Base Damage",
                     1f,
                     1f,
-                    statFormatter: TitanicDamageFormatter,
-                    itemTag: BetterUI.ItemStats.ItemTag.Damage
+                    statFormatter: TitanicDamageFormatter
                 );
                 // Warmog's Armor
                 BetterUI.ItemStats.RegisterStat(
@@ -208,7 +223,7 @@ namespace LeagueItems
                 }
             };
 
-            public static BetterUI.ItemStats.StatFormatter HeartsteelFormatter = new()
+            public static BetterUI.ItemStats.StatFormatter HeartsteelTotalFormatter = new()
             {
                 suffix = " HP",
                 style = BetterUI.ItemStats.Styles.Health,
@@ -229,6 +244,8 @@ namespace LeagueItems
                     {
                         sb.Append("0");
                     }
+
+                    sb.Append("/" + String.Format("{0:#}", Heartsteel.CalculateMaxStackableHealth(value)));
                 }
             };
 
@@ -259,7 +276,7 @@ namespace LeagueItems
 
                     if (component)
                     {
-                        string temp = String.Format("{0:#}", component.TotalDamageDealt);
+                        string temp = String.Format("{0:#.#}", component.TotalDamageDealt);
                         temp = temp == "" ? "0" : temp;
 
                         sb.AppendFormat(temp);

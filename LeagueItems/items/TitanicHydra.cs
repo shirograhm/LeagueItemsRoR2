@@ -11,10 +11,10 @@ namespace LeagueItems
     {
         public static ItemDef itemDef;
 
-        // Increase base damage by 3% (+1% per stack) of max health.
-        public static float firstStackBonusNumber = 3f;
+        // Increase damage by 2% (+0.5% per stack) of max health.
+        public static float firstStackBonusNumber = 2f;
         public static float firstStackBonusPercent = firstStackBonusNumber / 100f;
-        public static float extraStackBonusNumber = 1f;
+        public static float extraStackBonusNumber = 0.5f;
         public static float extraStackBonusPercent = extraStackBonusNumber / 100f;
 
         internal static void Init()
@@ -110,10 +110,10 @@ namespace LeagueItems
             LanguageAPI.Add("THToken", "Titanic Hydra");
 
             // The Pickup is the short text that appears when you first pick this up. This text should be short and to the point, numbers are generally ommited.
-            LanguageAPI.Add("THPickup", "Increase base damage by a percentage of your max health.");
+            LanguageAPI.Add("THPickup", "Increase damage by a percentage of your max health.");
 
             // The Description is where you put the actual numbers and give an advanced description.
-            LanguageAPI.Add("THDesc", "Increase base damage by <style=cIsHealth>" + firstStackBonusNumber + "%</style> <style=cStack>(+" + extraStackBonusNumber + "% per stack)</style> of max health.");
+            LanguageAPI.Add("THDesc", "Increase damage by <style=cIsHealth>" + firstStackBonusNumber + "%</style> <style=cStack>(+" + extraStackBonusNumber + "% per stack)</style> of max health.");
 
             // The Lore is, well, flavor. You can write pretty much whatever you want here.
             LanguageAPI.Add("THLore", "A large weapon.");

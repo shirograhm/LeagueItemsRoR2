@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 468433301
+CRC: 2891148674
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 0bbe18fffa7ccaab5063527553057538
+    Hash: 4e7370ee499f7061ab36db3375f30d94
   TypeTreeHash:
     serializedVersion: 2
     Hash: 011d1bb1b97750065fc8e33fbaec9bad
@@ -18,13 +18,17 @@ ClassTypes:
 - Class: 213
   Script: {instanceID: 0}
 Assets:
-- Assets/Textures/Icons/Item/Bloodthirster/Bloodthirster.png
+- Assets/Textures/Icons/Item/DeadMansPlate.png
+- Assets/Textures/Icons/Item/TrinityForce.png
 - Assets/Materials/Item/BotRK/BotRKMaterial.mat
-- Assets/Textures/Icons/Item/SpearOfShojin/SpearofShojin.png
-- Assets/Textures/Icons/Item/NashorsTooth/NashorsTooth.png
-- Assets/Textures/Icons/Item/BotRK/BotRK.png
-- Assets/Textures/Icons/Item/TitanicHydra/TitanicHydra.png
-- Assets/Textures/Icons/Item/DeadMansPlate/DeadMansPlate.png
-- Assets/Textures/Icons/Item/WarmogsArmor/WarmogsArmor.png
-- Assets/Textures/Icons/Item/Heartsteel/Heartsteel.png
+- Assets/Textures/Icons/Item/DeathsDance.png
+- Assets/Textures/Icons/Item/NashorsTooth.png
+- Assets/Textures/Icons/Item/BotRK.png
+- Assets/Textures/Icons/Item/SpearofShojin.png
+- Assets/Textures/Icons/Item/TitanicHydra.png
+- Assets/Textures/Icons/Item/WarmogsArmor.png
+- Assets/Textures/Icons/Item/GuinsoosRageblade.png
+- Assets/Textures/Icons/Item/Bloodthirster.png
+- Assets/Textures/Icons/Item/Heartsteel.png
+- Assets/Textures/Icons/Item/InfinityEdge.png
 Dependencies: []

@@ -1,21 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using R2API;
+using R2API.Networking;
+using R2API.Networking.Interfaces;
 using RoR2;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.Networking;
 
 namespace LeagueItems
 {
-    internal class SpearOfShojin
+    internal class InfinityEdge
     {
         public static ItemDef itemDef;
 
-        // Gain 50% (+50% per stack) of your base damage as bonus cooldown reduction, up to a maximum bonus of 50% CDR.
-        public const float MAX_BONUS_CDR = 40.0f;
+        public static Color32 ragebladeColor = new Color32();
 
-        public static float cdrFromDamageNumber = 25.0f;
-        public static float cdrFromDamagePercent = cdrFromDamageNumber / 100f;
+        // Gain 6% (+6% per stack) crit chance and 16% (+16% per stack) crit damage.
+        public static float critChanceIncreaseNumber = 6f;
+        public static float critChanceIncreasePercent = critChanceIncreaseNumber / 100f;
+        public static float critDamageIncreaseNumber = 16f;
+        public static float critDamageIncreasePercent = critDamageIncreaseNumber / 100f;
 
         internal static void Init()
         {
@@ -32,27 +37,29 @@ namespace LeagueItems
         {
             itemDef = ScriptableObject.CreateInstance<ItemDef>();
             // Language Tokens, explained there https://risk-of-thunder.github.io/R2Wiki/Mod-Creation/Assets/Localization/
-            itemDef.name = "SoS";
-            itemDef.nameToken = "SoSToken";
-            itemDef.pickupToken = "SoSPickup";
-            itemDef.descriptionToken = "SoSDesc";
-            itemDef.loreToken = "SoSLore";
+            itemDef.name = "IE";
+            itemDef.nameToken = "IEToken";
+            itemDef.pickupToken = "IEPickup";
+            itemDef.descriptionToken = "IEDesc";
+            itemDef.loreToken = "IELore";
 
 #pragma warning disable Publicizer001
-            itemDef._itemTierDef = Addressables.LoadAssetAsync<ItemTierDef>("RoR2/Base/Common/Tier3Def.asset").WaitForCompletion();
+            itemDef._itemTierDef = Addressables.LoadAssetAsync<ItemTierDef>("RoR2/Base/Common/Tier2Def.asset").WaitForCompletion();
 #pragma warning restore Publicizer001
-            itemDef.pickupIconSprite = LeagueItemsPlugin.MainAssets.LoadAsset<Sprite>("SpearOfShojin.png");
+            itemDef.pickupIconSprite = LeagueItemsPlugin.MainAssets.LoadAsset<Sprite>("InfinityEdge.png");
             itemDef.pickupModelPrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Mystery/PickupMystery.prefab").WaitForCompletion();
             itemDef.canRemove = true;
             itemDef.hidden = false;
         }
 
-        public static float CalculateBonusCooldownReduction(CharacterBody sender, float itemCount)
+        public static float CalculateTotalCritChancePercent(float itemCount)
         {
-            float hyperbolicPercentage = 1 - (1 / (1 + (cdrFromDamagePercent * itemCount)));
-            float bonusCDR = hyperbolicPercentage * sender.damage;
-            // Cap cooldown reduction
-            return Mathf.Clamp(bonusCDR, 0, MAX_BONUS_CDR);
+            return critChanceIncreasePercent * itemCount;
+        }
+
+        public static float CalculateTotalCritDamagePercent(float itemCount)
+        {
+            return critDamageIncreasePercent * itemCount;
         }
 
         private static void Hooks()
@@ -65,8 +72,11 @@ namespace LeagueItems
 
                     if (itemCount > 0)
                     {
-                        float bonusCDR = CalculateBonusCooldownReduction(sender, itemCount);
-                        args.cooldownMultAdd -= bonusCDR / 100f;
+                        float critChanceIncrease = CalculateTotalCritChancePercent(itemCount);
+                        float critDamageIncrease = CalculateTotalCritDamagePercent(itemCount);
+
+                        args.critAdd += critChanceIncrease * 100f;
+                        args.critDamageMultAdd += critDamageIncrease;
                     }
                 }
             };
@@ -87,15 +97,18 @@ namespace LeagueItems
                     {
                         int itemCount = self.itemInventoryDisplay.inventory.GetItemCount(itemDef);
 
-                        float bonusCDR = CalculateBonusCooldownReduction(characterMaster.GetBody(), itemCount);
+                        float critChanceBonus = CalculateTotalCritChancePercent(itemCount) * 100f;
+                        string critChanceBonusText = String.Format("{0:#}", critChanceBonus);
 
-                        string valueBaseDamageText = String.Format("{0:#.#}", bonusCDR);
+                        float critDamageBonus = CalculateTotalCritDamagePercent(itemCount) * 100f;
+                        string critDamageBonusText = String.Format("{0:#}", critDamageBonus);
 
                         if (item.itemIndex == itemDef.itemIndex)
                         {
                             item.tooltipProvider.overrideBodyText =
                                 Language.GetString(itemDef.descriptionToken)
-                                + "<br><br>Bonus Cooldown Reduction: " + valueBaseDamageText;
+                                + "<br><br>Bonus Crit Chance: " + critChanceBonusText
+                                + "<br>Bonus Crit Damage: " + critDamageBonusText;
                         }
                     });
 #pragma warning restore Publicizer001
@@ -103,24 +116,24 @@ namespace LeagueItems
             };
         }
 
-        // This function adds the tokens from the item using LanguageAPI, the comments in here are a style guide, but is very opiniated. Make your own judgements!
+
         private static void AddTokens()
         {
             // The Name should be self explanatory
-            LanguageAPI.Add("SoS", "Spear of Shojin");
+            LanguageAPI.Add("IE", "Infinity Edge");
 
             // Name Token
-            LanguageAPI.Add("SoSToken", "Spear of Shojin");
+            LanguageAPI.Add("IEToken", "Infinity Edge");
 
             // The Pickup is the short text that appears when you first pick this up. This text should be short and to the point, numbers are generally ommited.
-            LanguageAPI.Add("SoSPickup", "Gain a percentage of your damage as bonus cooldown reduction.");
+            LanguageAPI.Add("heartsteelPickup", "Gain crit chance and crit damage.");
 
             // The Description is where you put the actual numbers and give an advanced description.
-            LanguageAPI.Add("SoSDesc", "Gain <style=cIsUtility>" + cdrFromDamageNumber + "%</style> <style=cStack>(+" + cdrFromDamageNumber + "% per stack)</style> "
-                                        + "of your base damage as bonus cooldown reduction, up to a maximum bonus of <style=cIsUtility>" + MAX_BONUS_CDR + "%</style> CDR.");
+            LanguageAPI.Add("IEDesc", "Gain <style=cIsUtility>" + critChanceIncreaseNumber + "%</style> <style=cStack>(+" + critChanceIncreaseNumber + "% per stack)</style> crit chance "
+                                       + "and <style=cIsUtility>" + critDamageIncreaseNumber + "%</style> <style=cStack>(+" + critDamageIncreaseNumber + "% per stack)</style> crit damage.");
 
             // The Lore is, well, flavor. You can write pretty much whatever you want here.
-            LanguageAPI.Add("SoSLore", "A jade spear.");
+            LanguageAPI.Add("IELore", "Infinity edge lore.");
         }
     }
 }

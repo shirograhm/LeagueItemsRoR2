@@ -14,10 +14,12 @@ namespace LeagueItems
     {
         public static ItemDef itemDef;
 
-        // Upon killing an elite enemy, gain 3% (+1% per stack) of your max health as permanent base health.
+        // Upon killing an elite enemy, gain 3% (+1.5% per stack) of your max health as permanent base health, up to a max of 500 (+500 per stack) bonus base health.
+        public const float MAX_HEALTH_BONUS_PER_STACK = 500f;
+        
         public static float firstStackIncreaseNumber = 3f;
         public static float firstStackIncreasePercent = firstStackIncreaseNumber / 100f;
-        public static float extraStackIncreaseNumber = 1f;
+        public static float extraStackIncreaseNumber = 1.5f;
         public static float extraStackIncreasePercent = extraStackIncreaseNumber / 100f;
 
         public class HeartsteelStatistics : MonoBehaviour
@@ -94,11 +96,11 @@ namespace LeagueItems
         {
             itemDef = ScriptableObject.CreateInstance<ItemDef>();
             // Language Tokens, explained there https://risk-of-thunder.github.io/R2Wiki/Mod-Creation/Assets/Localization/
-            itemDef.name = "heartsteel";
-            itemDef.nameToken = "heartsteelToken";
-            itemDef.pickupToken = "heartsteelPickup";
-            itemDef.descriptionToken = "heartsteelDesc";
-            itemDef.loreToken = "heartsteelLore";
+            itemDef.name = "HS";
+            itemDef.nameToken = "HSToken";
+            itemDef.pickupToken = "HSPickup";
+            itemDef.descriptionToken = "HSDesc";
+            itemDef.loreToken = "HSLore";
 
 #pragma warning disable Publicizer001
             itemDef._itemTierDef = Addressables.LoadAssetAsync<ItemTierDef>("RoR2/Base/Common/Tier3Def.asset").WaitForCompletion();
@@ -112,6 +114,11 @@ namespace LeagueItems
         public static float CalculateHealthIncreasePercent(float itemCount)
         {
             return firstStackIncreasePercent + (itemCount - 1) * extraStackIncreasePercent;
+        }
+
+        public static float CalculateMaxStackableHealth(float itemCount)
+        {
+            return itemCount * MAX_HEALTH_BONUS_PER_STACK;
         }
 
         private static void Hooks()
@@ -141,7 +148,10 @@ namespace LeagueItems
                         var itemStats = damageReport.attackerBody.inventory.GetComponent<HeartsteelStatistics>();
 
                         float healthToGain = (damageReport.attackerBody.healthComponent.fullHealth) * CalculateHealthIncreasePercent(itemCount);
+
                         itemStats.TotalBonusHealth += healthToGain;
+                        // Cap max heartsteel health increase based on stacks
+                        itemStats.TotalBonusHealth = Mathf.Clamp(itemStats.TotalBonusHealth, 0, CalculateMaxStackableHealth(itemCount));
                     }
                 }
             };
@@ -196,20 +206,20 @@ namespace LeagueItems
         private static void AddTokens()
         {
             // The Name should be self explanatory
-            LanguageAPI.Add("heartsteel", "Heartsteel");
+            LanguageAPI.Add("HS", "Heartsteel");
 
             // Name Token
-            LanguageAPI.Add("heartsteelToken", "Heartsteel");
+            LanguageAPI.Add("HSToken", "Heartsteel");
 
             // The Pickup is the short text that appears when you first pick this up. This text should be short and to the point, numbers are generally ommited.
-            LanguageAPI.Add("heartsteelPickup", "Gain stacking movement speed over time. Expend max stacks to deal bonus damage on-hit.");
+            LanguageAPI.Add("HSPickup", "Gain stacking movement speed over time. Expend max stacks to deal bonus damage on-hit.");
 
             // The Description is where you put the actual numbers and give an advanced description.
-            LanguageAPI.Add("heartsteelDesc", "Upon killing an elite enemy, gain <style=cIsHealth>" + firstStackIncreaseNumber + "%</style> <style=cStack>(+" + extraStackIncreaseNumber + "% per stack)</style>"
-                                               + " of their max health as permanent base health.");
+            LanguageAPI.Add("HSDesc", "Upon killing an elite enemy, gain <style=cIsHealth>" + firstStackIncreaseNumber + "%</style> <style=cStack>(+" + extraStackIncreaseNumber + "% per stack)</style> "
+                                       + "of your max health as permanent base health, up to a max of <style=cIsHealth>" + MAX_HEALTH_BONUS_PER_STACK + "</style> <style=cStack>(+" + MAX_HEALTH_BONUS_PER_STACK + " per stack)</style> bonus health.");
 
             // The Lore is, well, flavor. You can write pretty much whatever you want here.
-            LanguageAPI.Add("heartsteelLore", "Heartsteel lore.");
+            LanguageAPI.Add("HSLore", "Heartsteel lore.");
         }
     }
 }
