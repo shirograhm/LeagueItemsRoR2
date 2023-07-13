@@ -32,37 +32,35 @@ namespace LeagueItems
         private static DamageAPI.ModdedDamageType deadMansDamageType;
         public static DamageColorIndex deadMansDamageColor = DamageColorAPI.RegisterDamageColor(deadmansColor);
 
-        public static Dictionary<UnityEngine.Networking.NetworkInstanceId, float> currentDamageProc = new Dictionary<UnityEngine.Networking.NetworkInstanceId, float>();
-        public static Dictionary<UnityEngine.Networking.NetworkInstanceId, float> totalDamageDealt = new Dictionary<UnityEngine.Networking.NetworkInstanceId, float>();
-
         public class DeadMansStatistics : MonoBehaviour
         {
             private float _totalDamageDealt;
-            public float totalDamageDealt
+            public float TotalDamageDealt
             {
                 get { return _totalDamageDealt; }
-                set {
+                set
+                {
                     _totalDamageDealt = value;
                     if (NetworkServer.active)
                     {
-                        new Sync(gameObject.GetComponent<NetworkIdentity>().netId, value).Send(NetworkDestination.Clients);
+                        new DeadMansSync(gameObject.GetComponent<NetworkIdentity>().netId, value).Send(NetworkDestination.Clients);
                     }
                 }
             }
 
-            public class Sync : INetMessage
+            public class DeadMansSync : INetMessage
             {
                 NetworkInstanceId objId;
                 float totalDamageDealt;
 
-                public Sync()
+                public DeadMansSync()
                 {
                 }
 
-                public Sync(NetworkInstanceId objId, float totalDamageDealt)
+                public DeadMansSync(NetworkInstanceId objId, float totalDamage)
                 {
                     this.objId = objId;
-                    this.totalDamageDealt = totalDamageDealt;
+                    this.totalDamageDealt = totalDamage;
                 }
 
                 public void Deserialize(NetworkReader reader)
@@ -76,10 +74,10 @@ namespace LeagueItems
                     if (NetworkServer.active) return;
 
                     GameObject obj = Util.FindNetworkObject(objId);
-                    if(obj)
+                    if (obj)
                     {
                         DeadMansStatistics component = obj.GetComponent<DeadMansStatistics>();
-                        if (component) component.totalDamageDealt = totalDamageDealt;
+                        if (component) component.TotalDamageDealt = totalDamageDealt;
                     }
                 }
 
@@ -93,7 +91,7 @@ namespace LeagueItems
 
         internal static void Init()
         {
-            NetworkingAPI.RegisterMessageType<DeadMansStatistics.Sync>();
+            NetworkingAPI.RegisterMessageType<DeadMansStatistics.DeadMansSync>();
 
             GenerateItem();
             GenerateBuff();
@@ -102,6 +100,8 @@ namespace LeagueItems
             var displayRules = new ItemDisplayRuleDict(null);
             ItemAPI.Add(new CustomItem(itemDef, displayRules));
             ContentAddition.AddBuffDef(momentumBuff);
+
+            NetworkingAPI.RegisterMessageType<DeadMansStatistics.DeadMansSync>();
 
             deadMansDamageType = DamageAPI.ReserveDamageType();
 
@@ -144,7 +144,12 @@ namespace LeagueItems
 
         private static void Hooks()
         {
-            On.RoR2.CharacterBody.FixedUpdate += (orig, self) =>
+            CharacterMaster.onStartGlobal += (obj) =>
+            {
+                if (obj.inventory) obj.inventory.gameObject.AddComponent<DeadMansStatistics>();
+            };
+
+            On.RoR2.CharacterBody.Update += (orig, self) =>
             {
                 orig(self);
 
@@ -183,9 +188,6 @@ namespace LeagueItems
 
                     if (itemCount > 0)
                     {
-                        float damageProc = CalculateDamageProc(sender, itemCount);
-                        Utilities.SetValueInDictionary(ref currentDamageProc, sender.master, damageProc);
-
                         int numStacks = sender.GetBuffCount(momentumBuff);
                         args.moveSpeedMultAdd += numStacks * movementSpeedPerStackPercent;
                     }
@@ -196,7 +198,9 @@ namespace LeagueItems
             {
                 orig(self, damageInfo, victim);
 
-                if (!damageInfo.attacker)
+                if (!NetworkServer.active) return;
+
+                if (damageInfo.attacker == null || victim == null)
                 {
                     return;
                 }
@@ -207,28 +211,33 @@ namespace LeagueItems
                 if (attackerBody?.inventory)
                 {
                     int itemCount = attackerBody.inventory.GetItemCount(itemDef.itemIndex);
-
-                    if (itemCount > 0 && attackerBody.GetBuffCount(momentumBuff) == MAX_MOMENTUM_STACKS)
+                    // If the item is in the inventory and the on-hit multiplier is greater than 0
+                    if (itemCount > 0 && damageInfo.procCoefficient > 0 &&
+                        attackerBody.GetBuffCount(momentumBuff) == MAX_MOMENTUM_STACKS)
                     {
-                        float damageProc = currentDamageProc.TryGetValue(attackerBody.master.netId, out float _) ? currentDamageProc[attackerBody.master.netId] : 0f;
+                        float damageProc = CalculateDamageProc(attackerBody, itemCount);
                         float deadMansDamage = damageInfo.procCoefficient * damageProc;
 
-                        DamageInfo deadMansProc = new DamageInfo();
-                        deadMansProc.damage = deadMansDamage;
-                        deadMansProc.attacker = damageInfo.attacker;
-                        deadMansProc.inflictor = damageInfo.attacker;
-                        deadMansProc.procCoefficient = 0f;
-                        deadMansProc.position = damageInfo.position;
-                        deadMansProc.crit = false;
-                        deadMansProc.damageColorIndex = deadMansDamageColor;
-                        deadMansProc.procChainMask = damageInfo.procChainMask;
-                        deadMansProc.damageType = DamageType.Silent;
+                        DamageInfo deadMansProc = new()
+                        {
+                            damage = deadMansDamage,
+                            attacker = damageInfo.attacker,
+                            inflictor = damageInfo.attacker,
+                            procCoefficient = 0f,
+                            position = damageInfo.position,
+                            crit = false,
+                            damageColorIndex = deadMansDamageColor,
+                            procChainMask = damageInfo.procChainMask,
+                            damageType = DamageType.Silent
+                        };
                         DamageAPI.AddModdedDamageType(deadMansProc, deadMansDamageType);
 
                         victimBody.healthComponent.TakeDamage(deadMansProc);
-                        Utilities.AddValueInDictionary(ref totalDamageDealt, attackerBody.master, deadMansDamage);
 
-                        // Reset stack to zero, reset stack time
+                        var itemStats = attackerBody.inventory.GetComponent<DeadMansStatistics>();
+                        itemStats.TotalDamageDealt += deadMansDamage;
+
+                        // Reset stacks to zero, reset stack time
 #pragma warning disable Publicizer001 // Accessing a member that was not originally public
                         attackerBody.SetBuffCount(momentumBuff.buffIndex, 0);
                         timeOfLastStack = Time.time;
@@ -249,22 +258,27 @@ namespace LeagueItems
                 if (self.itemInventoryDisplay && characterMaster)
                 {
 #pragma warning disable Publicizer001
-                    self.itemInventoryDisplay.itemIcons.ForEach(delegate (RoR2.UI.ItemIcon item)
+                    var itemStats = self.itemInventoryDisplay.inventory.GetComponent<DeadMansStatistics>();
+
+                    if (itemStats)
                     {
-                        float damageProc = currentDamageProc.TryGetValue(characterMaster.netId, out float _) ? currentDamageProc[characterMaster.netId] : 0f;
-                        float totalDamage = totalDamageDealt.TryGetValue(characterMaster.netId, out float _) ? totalDamageDealt[characterMaster.netId] : 0f;
-
-                        string valueProcText = damageProc == 0 ? "0" : String.Format("{0:#}", damageProc);
-                        string valueDamageText = totalDamage == 0 ? "0" : String.Format("{0:#}", totalDamage);
-
-                        if (item.itemIndex == itemDef.itemIndex)
+                        self.itemInventoryDisplay.itemIcons.ForEach(delegate (RoR2.UI.ItemIcon item)
                         {
-                            item.tooltipProvider.overrideBodyText =
-                                Language.GetString(itemDef.descriptionToken)
-                                + "<br><br>Proc Damage: " + valueProcText
-                                + "<br>Total Damage Dealt: " + valueDamageText;
-                        }
-                    });
+                            int itemCount = self.itemInventoryDisplay.inventory.GetItemCount(itemDef);
+                            float damageProc = CalculateDamageProc(characterMaster.GetBody(), itemCount);
+
+                            string valueProcText = String.Format("{0:#}", damageProc);
+                            string valueDamageText = String.Format("{0:#}", itemStats.TotalDamageDealt);
+
+                            if (item.itemIndex == itemDef.itemIndex)
+                            {
+                                item.tooltipProvider.overrideBodyText =
+                                    Language.GetString(itemDef.descriptionToken)
+                                    + "<br><br>Proc Damage: " + valueProcText
+                                    + "<br>Total Damage Dealt: " + valueDamageText;
+                            }
+                        });
+                    }
 #pragma warning restore Publicizer001
                 }
             };

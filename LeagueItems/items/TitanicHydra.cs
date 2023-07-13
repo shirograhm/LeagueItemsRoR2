@@ -17,8 +17,6 @@ namespace LeagueItems
         public static float extraStackBonusNumber = 1f;
         public static float extraStackBonusPercent = extraStackBonusNumber / 100f;
 
-        public static Dictionary<UnityEngine.Networking.NetworkInstanceId, float> currentBonusBaseDamage = new Dictionary<UnityEngine.Networking.NetworkInstanceId, float>();
-
         internal static void Init()
         {
             GenerateItem();
@@ -51,41 +49,20 @@ namespace LeagueItems
 
         public static float CalculateBonusBaseDamage(CharacterBody sender, float itemCount)
         {
-            float baseMaxHealth = sender.healthComponent.fullHealth;
-            return (firstStackBonusPercent + extraStackBonusPercent * (itemCount - 1)) * baseMaxHealth;
+            return (firstStackBonusPercent + extraStackBonusPercent * (itemCount - 1)) * sender.healthComponent.fullHealth;
         }
 
         private static void Hooks()
         {
-            On.RoR2.CharacterBody.FixedUpdate += (orig, self) =>
-            {
-                orig(self);
-
-                if (!self || !self.inventory)
-                {
-                    return;
-                }
-
-                int itemCount = self.inventory.GetItemCount(itemDef);
-                if (itemCount > 0)
-                {
-                    float bonusBaseDamage = CalculateBonusBaseDamage(self, itemCount);
-                    Utilities.SetValueInDictionary(ref currentBonusBaseDamage, self.master, bonusBaseDamage);
-                }
-            };
-
             RecalculateStatsAPI.GetStatCoefficients += (sender, args) =>
             {
                 if (sender.inventory && sender.master)
                 {
                     int itemCount = sender.inventory.GetItemCount(itemDef);
-                    int extraCount = itemCount - 1;
 
                     if (itemCount > 0)
                     {
                         float bonusBaseDamage = CalculateBonusBaseDamage(sender, itemCount);
-                        Utilities.SetValueInDictionary(ref currentBonusBaseDamage, sender.master, bonusBaseDamage);
-
                         args.baseDamageAdd += bonusBaseDamage;
                     }
                 }
@@ -105,9 +82,11 @@ namespace LeagueItems
 #pragma warning disable Publicizer001
                     self.itemInventoryDisplay.itemIcons.ForEach(delegate (RoR2.UI.ItemIcon item)
                     {
-                        float bonusBaseDamage = currentBonusBaseDamage.TryGetValue(characterMaster.netId, out float _) ? currentBonusBaseDamage[characterMaster.netId] : 0f;
+                        int itemCount = self.itemInventoryDisplay.inventory.GetItemCount(itemDef);
 
-                        string valueBaseDamageText = bonusBaseDamage == 0 ? "0" : String.Format("{0:#}", bonusBaseDamage);
+                        float bonusBaseDamage = CalculateBonusBaseDamage(characterMaster.GetBody(), itemCount);
+
+                        string valueBaseDamageText = bonusBaseDamage == 0 ? "0" : String.Format("{0:#.#}", bonusBaseDamage);
 
                         if (item.itemIndex == itemDef.itemIndex)
                         {

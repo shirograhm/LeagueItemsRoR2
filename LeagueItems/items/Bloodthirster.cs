@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using R2API;
+using R2API.Networking;
+using R2API.Networking.Interfaces;
 using RoR2;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.Networking;
 
 namespace LeagueItems
 {
@@ -15,7 +18,63 @@ namespace LeagueItems
         public static float bonusLifestealNumber = 10f;
         public static float bonusLifestealPercent = bonusLifestealNumber / 100f;
 
-        public static Dictionary<UnityEngine.Networking.NetworkInstanceId, float> totalHealingDone = new Dictionary<UnityEngine.Networking.NetworkInstanceId, float>();
+        public class BloodthirsterStatistics : MonoBehaviour
+        {
+            private float _totalHealingDone;
+            public float TotalHealingDone
+            {
+                get { return _totalHealingDone; }
+                set
+                {
+                    _totalHealingDone = value;
+                    if (NetworkServer.active)
+                    {
+                        new BloodthirsterSync(gameObject.GetComponent<NetworkIdentity>().netId, value).Send(NetworkDestination.Clients);
+                    }
+                }
+            }
+
+            public class BloodthirsterSync : INetMessage
+            {
+                NetworkInstanceId objId;
+                float totalHealingDone;
+
+                public BloodthirsterSync()
+                {
+                }
+
+                public BloodthirsterSync(NetworkInstanceId objId, float totalHealing)
+                {
+                    this.objId = objId;
+                    this.totalHealingDone = totalHealing;
+                }
+
+                public void Deserialize(NetworkReader reader)
+                {
+                    objId = reader.ReadNetworkId();
+                    totalHealingDone = reader.ReadSingle();
+                }
+
+                public void OnReceived()
+                {
+                    if (NetworkServer.active) return;
+
+                    GameObject obj = Util.FindNetworkObject(objId);
+                    if (obj)
+                    {
+                        BloodthirsterStatistics component = obj.GetComponent<BloodthirsterStatistics>();
+                        if (component) component.TotalHealingDone = totalHealingDone;
+                    }
+                }
+
+                public void Serialize(NetworkWriter writer)
+                {
+                    writer.Write(objId);
+                    writer.Write(totalHealingDone);
+                }
+            }
+        }
+
         internal static void Init()
         {
             GenerateItem();
@@ -23,6 +82,8 @@ namespace LeagueItems
 
             var displayRules = new ItemDisplayRuleDict(null);
             ItemAPI.Add(new CustomItem(itemDef, displayRules));
+
+            NetworkingAPI.RegisterMessageType<BloodthirsterStatistics.BloodthirsterSync>();
 
             Hooks();
         }
@@ -48,15 +109,24 @@ namespace LeagueItems
 
         private static void Hooks()
         {
+            CharacterMaster.onStartGlobal += (obj) =>
+            {
+                if (obj.inventory) obj.inventory.gameObject.AddComponent<BloodthirsterStatistics>();
+            };
+
             On.RoR2.GlobalEventManager.OnHitEnemy += (orig, self, damageInfo, victim) =>
             {
                 orig(self, damageInfo, victim);
-                if (!damageInfo.attacker)
+
+                if (!NetworkServer.active) return;
+
+                if (damageInfo.attacker == null || victim == null)
                 {
                     return;
                 }
 
                 CharacterBody attackerBody = damageInfo.attacker.GetComponent<CharacterBody>();
+
                 if (attackerBody?.inventory)
                 {
                     int itemCount = attackerBody.inventory.GetItemCount(itemDef.itemIndex);
@@ -68,7 +138,10 @@ namespace LeagueItems
                         float healAmount = damageInfo.damage * hyperbolicPercentage;
 
                         attackerBody.healthComponent.Heal(healAmount, damageInfo.procChainMask);
-                        Utilities.AddValueInDictionary(ref totalHealingDone, attackerBody.master, healAmount);
+
+                        // Store healing for total health count
+                        var itemStats = attackerBody.inventory.GetComponent<BloodthirsterStatistics>();
+                        itemStats.TotalHealingDone += healAmount;
                     }
                 }
             };
@@ -85,19 +158,22 @@ namespace LeagueItems
                 if (self.itemInventoryDisplay && characterMaster)
                 {
 #pragma warning disable Publicizer001
-                    self.itemInventoryDisplay.itemIcons.ForEach(delegate (RoR2.UI.ItemIcon item)
+                    var itemStats = self.itemInventoryDisplay.inventory.GetComponent<BloodthirsterStatistics>();
+
+                    if (itemStats)
                     {
-                        float totalHealing = totalHealingDone.TryGetValue(characterMaster.netId, out float _) ? totalHealingDone[characterMaster.netId] : 0f;
-
-                        string valueHealingText = totalHealing == 0 ? "0" : String.Format("{0:#}", totalHealing);
-
-                        if (item.itemIndex == itemDef.itemIndex)
+                        self.itemInventoryDisplay.itemIcons.ForEach(delegate (RoR2.UI.ItemIcon item)
                         {
-                            item.tooltipProvider.overrideBodyText =
-                                Language.GetString(itemDef.descriptionToken)
-                                + "<br><br>Total Healing Done: " + valueHealingText;
-                        }
-                    });
+                            string valueHealingText = String.Format("{0:#}", itemStats.TotalHealingDone);
+
+                            if (item.itemIndex == itemDef.itemIndex)
+                            {
+                                item.tooltipProvider.overrideBodyText =
+                                    Language.GetString(itemDef.descriptionToken)
+                                    + "<br><br>Total Healing Done: " + valueHealingText;
+                            }
+                        });
+                    }
 #pragma warning restore Publicizer001
                 }
             };

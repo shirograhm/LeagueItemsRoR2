@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using R2API;
+using R2API.Networking;
+using R2API.Networking.Interfaces;
 using RoR2;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.Networking;
 
 namespace LeagueItems
 {
@@ -11,11 +14,68 @@ namespace LeagueItems
     {
         public static ItemDef itemDef;
 
-        // Upon killing an elite enemy, gain 1% (+1% per stack) of their max health as permanent base health.
-        public static float heartsteelValuePerStack = 1f;
-        public static float heartsteelValuePerStackPercentage = heartsteelValuePerStack / 100f;
+        // Upon killing an elite enemy, gain 3% (+1% per stack) of your max health as permanent base health.
+        public static float firstStackIncreaseNumber = 3f;
+        public static float firstStackIncreasePercent = firstStackIncreaseNumber / 100f;
+        public static float extraStackIncreaseNumber = 1f;
+        public static float extraStackIncreasePercent = extraStackIncreaseNumber / 100f;
 
-        public static Dictionary<UnityEngine.Networking.NetworkInstanceId, float> totalHealthGained = new Dictionary<UnityEngine.Networking.NetworkInstanceId, float>();
+        public class HeartsteelStatistics : MonoBehaviour
+        {
+            private float _totalBonusHealth;
+            public float TotalBonusHealth
+            {
+                get { return _totalBonusHealth; }
+                set
+                {
+                    _totalBonusHealth = value;
+                    if (NetworkServer.active)
+                    {
+                        new HeartsteelSync(gameObject.GetComponent<NetworkIdentity>().netId, value).Send(NetworkDestination.Clients);
+                    }
+                }
+            }
+
+            public class HeartsteelSync : INetMessage
+            {
+                NetworkInstanceId objId;
+                float totalBonusHealth;
+
+                public HeartsteelSync()
+                {
+                }
+
+                public HeartsteelSync(NetworkInstanceId objId, float totalBonusHP)
+                {
+                    this.objId = objId;
+                    this.totalBonusHealth = totalBonusHP;
+                }
+
+                public void Deserialize(NetworkReader reader)
+                {
+                    objId = reader.ReadNetworkId();
+                    totalBonusHealth = reader.ReadSingle();
+                }
+
+                public void OnReceived()
+                {
+                    if (NetworkServer.active) return;
+
+                    GameObject obj = Util.FindNetworkObject(objId);
+                    if (obj)
+                    {
+                        HeartsteelStatistics component = obj.GetComponent<HeartsteelStatistics>();
+                        if (component) component.TotalBonusHealth = totalBonusHealth;
+                    }
+                }
+
+                public void Serialize(NetworkWriter writer)
+                {
+                    writer.Write(objId);
+                    writer.Write(totalBonusHealth);
+                }
+            }
+        }
 
         internal static void Init()
         {
@@ -24,6 +84,8 @@ namespace LeagueItems
 
             var displayRules = new ItemDisplayRuleDict(null);
             ItemAPI.Add(new CustomItem(itemDef, displayRules));
+
+            NetworkingAPI.RegisterMessageType<HeartsteelStatistics.HeartsteelSync>();
 
             Hooks();
         }
@@ -47,11 +109,23 @@ namespace LeagueItems
             itemDef.hidden = false;
         }
 
+        public static float CalculateHealthIncreasePercent(float itemCount)
+        {
+            return firstStackIncreasePercent + (itemCount - 1) * extraStackIncreasePercent;
+        }
+
         private static void Hooks()
         {
+            CharacterMaster.onStartGlobal += (obj) =>
+            {
+                if (obj.inventory) obj.inventory.gameObject.AddComponent<HeartsteelStatistics>();
+            };
+
             On.RoR2.GlobalEventManager.OnCharacterDeath += (orig, eventManager, damageReport) =>
             {
                 orig(eventManager, damageReport);
+
+                if (!NetworkServer.active) return;
 
                 if (!damageReport.victim || !damageReport.attacker)
                 {
@@ -64,8 +138,10 @@ namespace LeagueItems
 
                     if (itemCount > 0 && damageReport.victimIsElite)
                     {
-                        float healthToGain = (damageReport.victimBody.healthComponent.fullHealth) * heartsteelValuePerStackPercentage;
-                        Utilities.AddValueInDictionary(ref totalHealthGained, damageReport.attackerMaster, healthToGain);
+                        var itemStats = damageReport.attackerBody.inventory.GetComponent<HeartsteelStatistics>();
+
+                        float healthToGain = (damageReport.attackerBody.healthComponent.fullHealth) * CalculateHealthIncreasePercent(itemCount);
+                        itemStats.TotalBonusHealth += healthToGain;
                     }
                 }
             };
@@ -75,11 +151,11 @@ namespace LeagueItems
                 if (sender.inventory)
                 {
                     int itemCount = sender.inventory.GetItemCount(itemDef);
+                    var itemStats = sender.inventory.GetComponent<HeartsteelStatistics>();
 
-                    if (itemCount > 0)
+                    if (itemCount > 0 && itemStats)
                     {
-                        float healthIncrease = totalHealthGained.TryGetValue(sender.master.netId, out float _) ? totalHealthGained[sender.master.netId] : 0f;
-                        args.baseHealthAdd += healthIncrease;
+                        args.baseHealthAdd += itemStats.TotalBonusHealth;
                     }
                 }
             };
@@ -96,19 +172,22 @@ namespace LeagueItems
                 if (self.itemInventoryDisplay && characterMaster)
                 {
 #pragma warning disable Publicizer001
-                    self.itemInventoryDisplay.itemIcons.ForEach(delegate (RoR2.UI.ItemIcon item)
+                    var itemStats = self.itemInventoryDisplay.inventory.GetComponent<HeartsteelStatistics>();
+
+                    if (itemStats)
                     {
-                        float healthGain = totalHealthGained.TryGetValue(characterMaster.netId, out float _) ? totalHealthGained[characterMaster.netId] : 0f;
-
-                        string valueHealthGainText = healthGain == 0 ? "0" : String.Format("{0:#.#}", healthGain);
-
-                        if (item.itemIndex == itemDef.itemIndex)
+                        self.itemInventoryDisplay.itemIcons.ForEach(delegate (RoR2.UI.ItemIcon item)
                         {
-                            item.tooltipProvider.overrideBodyText =
-                                Language.GetString(itemDef.descriptionToken)
-                                + "<br><br>Total Bonus Health: " + valueHealthGainText;
-                        }
-                    });
+                            string valueHealthGainText = String.Format("{0:#.#}", itemStats.TotalBonusHealth);
+
+                            if (item.itemIndex == itemDef.itemIndex)
+                            {
+                                item.tooltipProvider.overrideBodyText =
+                                    Language.GetString(itemDef.descriptionToken)
+                                    + "<br><br>Total Bonus Health: " + valueHealthGainText + " HP";
+                            }
+                        });
+                    }
 #pragma warning restore Publicizer001
                 }
             };
@@ -126,7 +205,7 @@ namespace LeagueItems
             LanguageAPI.Add("heartsteelPickup", "Gain stacking movement speed over time. Expend max stacks to deal bonus damage on-hit.");
 
             // The Description is where you put the actual numbers and give an advanced description.
-            LanguageAPI.Add("heartsteelDesc", "Upon killing an elite enemy, gain <style=cIsHealth>" + heartsteelValuePerStack + "%</style> <style=cStack>(+" + heartsteelValuePerStack + "% per stack)</style>"
+            LanguageAPI.Add("heartsteelDesc", "Upon killing an elite enemy, gain <style=cIsHealth>" + firstStackIncreaseNumber + "%</style> <style=cStack>(+" + extraStackIncreaseNumber + "% per stack)</style>"
                                                + " of their max health as permanent base health.");
 
             // The Lore is, well, flavor. You can write pretty much whatever you want here.

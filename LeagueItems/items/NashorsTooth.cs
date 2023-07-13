@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using R2API;
+using R2API.Networking;
+using R2API.Networking.Interfaces;
 using RoR2;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.Networking;
 
 namespace LeagueItems
 {
@@ -19,8 +22,62 @@ namespace LeagueItems
         public static DamageAPI.ModdedDamageType nashorsDamageType;
         public static DamageColorIndex nashorsDamageColor = DamageColorAPI.RegisterDamageColor(nashorsColor);
 
-        public static Dictionary<UnityEngine.Networking.NetworkInstanceId, float> cumOnHitDamage = new Dictionary<UnityEngine.Networking.NetworkInstanceId, float>();
-        public static Dictionary<UnityEngine.Networking.NetworkInstanceId, float> totalDamageDone = new Dictionary<UnityEngine.Networking.NetworkInstanceId, float>();
+        public class NashorsStatistics : MonoBehaviour
+        {
+            private float _totalDamageDealt;
+            public float TotalDamageDealt
+            {
+                get { return _totalDamageDealt; }
+                set
+                {
+                    _totalDamageDealt = value;
+                    if (NetworkServer.active)
+                    {
+                        new NashorsSync(gameObject.GetComponent<NetworkIdentity>().netId, value).Send(NetworkDestination.Clients);
+                    }
+                }
+            }
+
+            public class NashorsSync : INetMessage
+            {
+                NetworkInstanceId objId;
+                float totalDamageDealt;
+
+                public NashorsSync()
+                {
+                }
+
+                public NashorsSync(NetworkInstanceId objId, float totalDamage)
+                {
+                    this.objId = objId;
+                    this.totalDamageDealt = totalDamage;
+                }
+
+                public void Deserialize(NetworkReader reader)
+                {
+                    objId = reader.ReadNetworkId();
+                    totalDamageDealt = reader.ReadSingle();
+                }
+
+                public void OnReceived()
+                {
+                    if (NetworkServer.active) return;
+
+                    GameObject obj = Util.FindNetworkObject(objId);
+                    if (obj)
+                    {
+                        NashorsStatistics component = obj.GetComponent<NashorsStatistics>();
+                        if (component) component.TotalDamageDealt = totalDamageDealt;
+                    }
+                }
+
+                public void Serialize(NetworkWriter writer)
+                {
+                    writer.Write(objId);
+                    writer.Write(totalDamageDealt);
+                }
+            }
+        }
 
         internal static void Init()
         {
@@ -30,7 +87,10 @@ namespace LeagueItems
             var displayRules = new ItemDisplayRuleDict(null);
             ItemAPI.Add(new CustomItem(itemDef, displayRules));
 
+            NetworkingAPI.RegisterMessageType<NashorsStatistics.NashorsSync>();
+
             nashorsDamageType = DamageAPI.ReserveDamageType();
+
             Hooks();
         }
 
@@ -61,28 +121,18 @@ namespace LeagueItems
 
         private static void Hooks()
         {
-            On.RoR2.CharacterBody.FixedUpdate += (orig, self) =>
+            CharacterMaster.onStartGlobal += (obj) =>
             {
-                orig(self);
-
-                if (!self || !self.inventory)
-                {
-                    return;
-                }
-
-                int itemCount = self.inventory.GetItemCount(itemDef);
-                if (itemCount > 0)
-                {
-                    float damageOnHit = CalculateDamageOnHit(self, itemCount);
-                    Utilities.SetValueInDictionary(ref cumOnHitDamage, self.master, damageOnHit);
-                }
+                if (obj.inventory) obj.inventory.gameObject.AddComponent<NashorsStatistics>();
             };
 
             On.RoR2.GlobalEventManager.OnHitEnemy += (orig, self, damageInfo, victim) =>
             {
                 orig(self, damageInfo, victim);
 
-                if (!damageInfo.attacker)
+                if (!NetworkServer.active) return;
+
+                if (damageInfo.attacker == null || victim == null)
                 {
                     return;
                 }
@@ -96,23 +146,27 @@ namespace LeagueItems
                     // If the item is in the inventory and the on-hit multiplier is greater than 0
                     if (itemCount > 0 && damageInfo.procCoefficient > 0)
                     {
-                        float damageOnHit = cumOnHitDamage.TryGetValue(attackerBody.master.netId, out float _) ? cumOnHitDamage[attackerBody.master.netId] : 0f;
+                        float damageOnHit = CalculateDamageOnHit(attackerBody, itemCount);
                         float nashorsDamage = damageInfo.procCoefficient * damageOnHit;
 
-                        DamageInfo nashorsProc = new DamageInfo();
-                        nashorsProc.damage = nashorsDamage;
-                        nashorsProc.attacker = damageInfo.attacker;
-                        nashorsProc.inflictor = damageInfo.attacker;
-                        nashorsProc.procCoefficient = 0f;
-                        nashorsProc.position = damageInfo.position;
-                        nashorsProc.crit = false;
-                        nashorsProc.damageColorIndex = nashorsDamageColor;
-                        nashorsProc.procChainMask = damageInfo.procChainMask;
-                        nashorsProc.damageType = DamageType.Silent;
+                        DamageInfo nashorsProc = new()
+                        {
+                            damage = nashorsDamage,
+                            attacker = damageInfo.attacker,
+                            inflictor = damageInfo.attacker,
+                            procCoefficient = 0f,
+                            position = damageInfo.position,
+                            crit = false,
+                            damageColorIndex = nashorsDamageColor,
+                            procChainMask = damageInfo.procChainMask,
+                            damageType = DamageType.Silent
+                        };
                         DamageAPI.AddModdedDamageType(nashorsProc, nashorsDamageType);
 
                         victimBody.healthComponent.TakeDamage(nashorsProc);
-                        Utilities.AddValueInDictionary(ref totalDamageDone, attackerBody.master, nashorsDamage);
+
+                        var itemStats = attackerBody.inventory.GetComponent<NashorsStatistics>();
+                        itemStats.TotalDamageDealt += nashorsDamage;
                     }
                 }
             };
@@ -129,22 +183,28 @@ namespace LeagueItems
                 if (self.itemInventoryDisplay && characterMaster)
                 {
 #pragma warning disable Publicizer001
-                    self.itemInventoryDisplay.itemIcons.ForEach(delegate (RoR2.UI.ItemIcon item)
+                    var itemStats = self.itemInventoryDisplay.inventory.GetComponent<NashorsStatistics>();
+
+                    if (itemStats)
                     {
-                        float currentOnHit = cumOnHitDamage.TryGetValue(characterMaster.netId, out float _) ? cumOnHitDamage[characterMaster.netId] : 0f;
-                        float totalDamage = totalDamageDone.TryGetValue(characterMaster.netId, out float _) ? totalDamageDone[characterMaster.netId] : 0f;
-
-                        string valueOnHit = currentOnHit == 0 ? "0" : String.Format("{0:#}", currentOnHit);
-                        string valueDamageText = totalDamage == 0 ? "0" : String.Format("{0:#}", totalDamage);
-
-                        if (item.itemIndex == itemDef.itemIndex)
+                        self.itemInventoryDisplay.itemIcons.ForEach(delegate (RoR2.UI.ItemIcon item)
                         {
-                            item.tooltipProvider.overrideBodyText =
-                                Language.GetString(itemDef.descriptionToken)
-                                + "<br><br>On Hit Damage: " + valueOnHit
-                                + "<br>Total Damage Done: " + valueDamageText;
-                        }
-                    });
+                            int itemCount = self.itemInventoryDisplay.inventory.GetItemCount(itemDef);
+
+                            float damageOnHit = CalculateDamageOnHit(characterMaster.GetBody(), itemCount);
+
+                            string valueOnHit = String.Format("{0:#}", damageOnHit);
+                            string valueDamageText = String.Format("{0:#}", itemStats.TotalDamageDealt);
+
+                            if (item.itemIndex == itemDef.itemIndex)
+                            {
+                                item.tooltipProvider.overrideBodyText =
+                                    Language.GetString(itemDef.descriptionToken)
+                                    + "<br><br>On Hit Damage: " + valueOnHit
+                                    + "<br>Total Damage Done: " + valueDamageText;
+                            }
+                        });
+                    }
 #pragma warning restore Publicizer001
                 }
             };

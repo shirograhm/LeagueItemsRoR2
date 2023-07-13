@@ -76,8 +76,8 @@ namespace LeagueItems
                 BetterUI.ItemStats.RegisterStat(
                     itemDef: Heartsteel.itemDef,
                     "Health Stolen From Elite Enemies: ",
-                    Heartsteel.heartsteelValuePerStackPercentage,
-                    Heartsteel.heartsteelValuePerStackPercentage,
+                    Heartsteel.firstStackIncreasePercent,
+                    Heartsteel.extraStackIncreasePercent,
                     stackingFormula: BetterUI.ItemStats.LinearStacking,
                     statFormatter: BetterUI.ItemStats.StatFormatter.Percent,
                     itemTag: BetterUI.ItemStats.ItemTag.MaxHealth
@@ -96,7 +96,7 @@ namespace LeagueItems
                     "On-Hit Damage",
                     1f,
                     1f,
-                    statFormatter: NashorsFormatter,
+                    statFormatter: NashorsOnHitFormatter,
                     itemTag: BetterUI.ItemStats.ItemTag.Damage
                 );
                 BetterUI.ItemStats.RegisterStat(
@@ -123,7 +123,7 @@ namespace LeagueItems
                     1f,
                     1f,
                     statFormatter: TitanicDamageFormatter,
-                    itemTag: BetterUI.ItemStats.ItemTag.MaxHealth
+                    itemTag: BetterUI.ItemStats.ItemTag.Damage
                 );
                 // Warmog's Armor
                 BetterUI.ItemStats.RegisterStat(
@@ -136,90 +136,149 @@ namespace LeagueItems
                 );
             }
 
-            public static BetterUI.ItemStats.StatFormatter BloodthirsterTotalFormatter = new BetterUI.ItemStats.StatFormatter()
+            public static BetterUI.ItemStats.StatFormatter BloodthirsterTotalFormatter = new()
             {
                 suffix = "",
-                style = BetterUI.ItemStats.Styles.Damage,
+                style = BetterUI.ItemStats.Styles.Healing,
                 statFormatter = (sb, value, master) =>
                 {
-                    float totalHealing = Bloodthirster.totalHealingDone.TryGetValue(master.netId, out float _) ? Bloodthirster.totalHealingDone[master.netId] : 0f;
-                    string valueHealingText = totalHealing == 0 ? "0" : String.Format("{0:#}", totalHealing);
+                    if (!master.inventory) return;
 
-                    sb.AppendFormat(valueHealingText);
+                    var component = master.inventory.GetComponent<Bloodthirster.BloodthirsterStatistics>();
+
+                    if (component)
+                    {
+                        string temp = String.Format("{0:#}", component.TotalHealingDone);
+                        temp = temp == "" ? "0" : temp;
+
+                        sb.AppendFormat(temp);
+                    }
+                    else
+                    {
+                        sb.Append("0");
+                    }
                 }
             };
-            
-            public static BetterUI.ItemStats.StatFormatter BotrkTotalFormatter = new BetterUI.ItemStats.StatFormatter()
+
+            public static BetterUI.ItemStats.StatFormatter BotrkTotalFormatter = new()
             {
                 suffix = "",
                 style = BetterUI.ItemStats.Styles.Damage,
                 statFormatter = (sb, value, master) =>
                 {
-                    float totalDamage = BladeOfTheRuinedKing.totalDamageDone.TryGetValue(master.netId, out float _) ? BladeOfTheRuinedKing.totalDamageDone[master.netId] : 0f;
-                    string valueDamageText = totalDamage == 0 ? "0" : String.Format("{0:#}", totalDamage);
+                    if (!master.inventory) return;
+
+                    var component = master.inventory.GetComponent<BladeOfTheRuinedKing.BladeStatistics>();
+
+                    if (component)
+                    {
+                        string temp = String.Format("{0:#}", component.TotalDamageDealt);
+                        temp = temp == "" ? "0" : temp;
+
+                        sb.AppendFormat(temp);
+                    }
+                    else
+                    {
+                        sb.Append("0");
+                    }
+                }
+            };
+
+            public static BetterUI.ItemStats.StatFormatter DeadMansTotalFormatter = new()
+            {
+                suffix = "",
+                style = BetterUI.ItemStats.Styles.Damage,
+                statFormatter = (sb, value, master) =>
+                {
+                    if (!master.inventory) return;
+
+                    var component = master.inventory.GetComponent<DeadMansPlate.DeadMansStatistics>();
+
+                    if (component)
+                    {
+                        string temp = String.Format("{0:#}", component.TotalDamageDealt);
+                        temp = temp == "" ? "0" : temp;
+
+                        sb.AppendFormat(temp);
+                    }
+                    else
+                    {
+                        sb.Append("0");
+                    }
+                }
+            };
+
+            public static BetterUI.ItemStats.StatFormatter HeartsteelFormatter = new()
+            {
+                suffix = " HP",
+                style = BetterUI.ItemStats.Styles.Health,
+                statFormatter = (sb, value, master) =>
+                {
+                    if(!master.inventory) return;
+
+                    var component = master.inventory.GetComponent<Heartsteel.HeartsteelStatistics>();
+
+                    if (component)
+                    {
+                        string temp = String.Format("{0:#}", component.TotalBonusHealth);
+                        temp = temp == "" ? "0" : temp;
+
+                        sb.AppendFormat(temp);
+                    }
+                    else
+                    {
+                        sb.Append("0");
+                    }
+                }
+            };
+
+            public static BetterUI.ItemStats.StatFormatter NashorsOnHitFormatter = new()
+            {
+                suffix = "",
+                style = BetterUI.ItemStats.Styles.Damage,
+                statFormatter = (sb, value, master) =>
+                {
+                    if (!master.hasBody) return;
+
+                    float onHitDamage = NashorsTooth.CalculateDamageOnHit(master.GetBody(), value);
+                    string valueDamageText = onHitDamage == 0 ? "0" : String.Format("{0:#}", onHitDamage);
 
                     sb.AppendFormat(valueDamageText);
                 }
             };
 
-            public static BetterUI.ItemStats.StatFormatter DeadMansTotalFormatter = new BetterUI.ItemStats.StatFormatter()
+            public static BetterUI.ItemStats.StatFormatter NashorsTotalFormatter = new()
             {
                 suffix = "",
                 style = BetterUI.ItemStats.Styles.Damage,
                 statFormatter = (sb, value, master) =>
                 {
-                    float totalDamage = DeadMansPlate.totalDamageDealt.TryGetValue(master.netId, out float _) ? DeadMansPlate.totalDamageDealt[master.netId] : 0f;
-                    string valueDamageText = totalDamage == 0 ? "0" : String.Format("{0:#}", totalDamage);
+                    if (!master.inventory) return;
 
-                    sb.AppendFormat(valueDamageText);
+                    var component = master.inventory.GetComponent<NashorsTooth.NashorsStatistics>();
+
+                    if (component)
+                    {
+                        string temp = String.Format("{0:#}", component.TotalDamageDealt);
+                        temp = temp == "" ? "0" : temp;
+
+                        sb.AppendFormat(temp);
+                    }
+                    else
+                    {
+                        sb.Append("0");
+                    }
                 }
             };
 
-            public static BetterUI.ItemStats.StatFormatter HeartsteelFormatter = new BetterUI.ItemStats.StatFormatter()
-            {
-                suffix = "",
-                style = BetterUI.ItemStats.Styles.Damage,
-                statFormatter = (sb, value, master) =>
-                {
-                    float totalHealth = Heartsteel.totalHealthGained.TryGetValue(master.netId, out float _) ? Heartsteel.totalHealthGained[master.netId] : 0f;
-                    string valueHealthText = totalHealth == 0 ? "0" : String.Format("{0:#.#}", totalHealth);
-
-                    sb.AppendFormat(valueHealthText);
-                }
-            };
-
-            public static BetterUI.ItemStats.StatFormatter NashorsFormatter = new BetterUI.ItemStats.StatFormatter()
-            {
-                suffix = "",
-                style = BetterUI.ItemStats.Styles.Damage,
-                statFormatter = (sb, value, master) =>
-                {
-                    float damageOnHit = NashorsTooth.CalculateDamageOnHit(master.GetBody(), value);
-                    string valueDamageOnHitText = damageOnHit == 0 ? "0" : String.Format("{0:#}", damageOnHit);
-
-                    sb.AppendFormat(valueDamageOnHitText);
-                }
-            };
-
-            public static BetterUI.ItemStats.StatFormatter NashorsTotalFormatter = new BetterUI.ItemStats.StatFormatter()
-            {
-                suffix = "",
-                style = BetterUI.ItemStats.Styles.Damage,
-                statFormatter = (sb, value, master) =>
-                {
-                    float totalDamage = NashorsTooth.totalDamageDone.TryGetValue(master.netId, out float _) ? NashorsTooth.totalDamageDone[master.netId] : 0f;
-                    string valueDamageText = totalDamage == 0 ? "0" : String.Format("{0:#}", totalDamage);
-
-                    sb.AppendFormat(valueDamageText);
-                }
-            };
-
-            public static BetterUI.ItemStats.StatFormatter SpearOfShojinFormatter = new BetterUI.ItemStats.StatFormatter()
+            public static BetterUI.ItemStats.StatFormatter SpearOfShojinFormatter = new()
             {
                 suffix = "%",
-                style = BetterUI.ItemStats.Styles.Damage,
+                style = BetterUI.ItemStats.Styles.Artifact,
                 statFormatter = (sb, value, master) =>
                 {
+                    if (!master.hasBody) return;
+
                     float bonusCDR = SpearOfShojin.CalculateBonusCooldownReduction(master.GetBody(), value);
                     string valueBonusCDRText = bonusCDR == 0 ? "0" : String.Format("{0:#.#}", bonusCDR);
 
@@ -227,33 +286,36 @@ namespace LeagueItems
                 }
             };
 
-            public static BetterUI.ItemStats.StatFormatter TitanicDamageFormatter = new BetterUI.ItemStats.StatFormatter()
+            public static BetterUI.ItemStats.StatFormatter TitanicDamageFormatter = new()
             {
                 suffix = "",
                 style = BetterUI.ItemStats.Styles.Damage,
                 statFormatter = (sb, value, master) =>
                 {
-                    float bonusBaseDamage = TitanicHydra.CalculateBonusBaseDamage(master.GetBody(), value);
-                    string valueBaseDamageText = bonusBaseDamage == 0 ? "0" : String.Format("{0:#.#}", bonusBaseDamage);
+                    if (!master.hasBody) return;
 
-                    sb.AppendFormat(valueBaseDamageText);
+                    float bonusBaseDamage = TitanicHydra.CalculateBonusBaseDamage(master.GetBody(), value);
+                    string valueBonusHealthText = bonusBaseDamage == 0 ? "0" : String.Format("{0:#.#}", bonusBaseDamage);
+
+                    sb.AppendFormat(valueBonusHealthText);
                 }
             };
 
-            public static BetterUI.ItemStats.StatFormatter WarmogsHealthFormatter = new BetterUI.ItemStats.StatFormatter()
+            public static BetterUI.ItemStats.StatFormatter WarmogsHealthFormatter = new()
             {
                 suffix = "",
-                style = BetterUI.ItemStats.Styles.Damage,
+                style = BetterUI.ItemStats.Styles.Health,
                 statFormatter = (sb, value, master) =>
                 {
-                    
+                    if (!master.hasBody) return;
+
                     float bonusHealth = WarmogsArmor.CalculateHealthIncrease(master.GetBody(), value);
                     string valueBonusHealthText = bonusHealth == 0 ? "0" : String.Format("{0:#}", bonusHealth);
 
-                    float warmogsPercentBonus = value * WarmogsArmor.bonusHealthIncreaseNumber;
-                    string valueWarmogsPercentText = warmogsPercentBonus == 0 ? "0" : String.Format("{0:#}", warmogsPercentBonus);
+                    float warmogsPercentBonus = WarmogsArmor.CalculateHealthIncreasePercent(master.GetBody(), value) * 100f;
+                    string valueWarmogsPercentText = warmogsPercentBonus == 0 ? "0" : String.Format(format: "({0:#}%)", warmogsPercentBonus);
 
-                    sb.AppendFormat("" + valueBonusHealthText + " (+" + valueWarmogsPercentText + "%)");
+                    sb.AppendFormat("" + valueBonusHealthText + " " + valueWarmogsPercentText + " HP");
                 }
             };
         }

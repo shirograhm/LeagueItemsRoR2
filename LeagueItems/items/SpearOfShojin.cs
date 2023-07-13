@@ -12,12 +12,10 @@ namespace LeagueItems
         public static ItemDef itemDef;
 
         // Gain 50% (+50% per stack) of your base damage as bonus cooldown reduction, up to a maximum bonus of 50% CDR.
-        public const float MAX_BONUS_CDR = 50.0f;
+        public const float MAX_BONUS_CDR = 40.0f;
 
-        public static float cdrFromDamageNumber = 50.0f;
+        public static float cdrFromDamageNumber = 25.0f;
         public static float cdrFromDamagePercent = cdrFromDamageNumber / 100f;
-
-        public static Dictionary<UnityEngine.Networking.NetworkInstanceId, float> bonusCooldownReduction = new Dictionary<UnityEngine.Networking.NetworkInstanceId, float>();
 
         internal static void Init()
         {
@@ -59,23 +57,6 @@ namespace LeagueItems
 
         private static void Hooks()
         {
-            On.RoR2.CharacterBody.FixedUpdate += (orig, self) =>
-            {
-                orig(self);
-
-                if (!self || !self.inventory)
-                {
-                    return;
-                }
-
-                int itemCount = self.inventory.GetItemCount(itemDef);
-                if (itemCount > 0)
-                {
-                    float bonusCDR = CalculateBonusCooldownReduction(self, itemCount);
-                    Utilities.SetValueInDictionary(ref bonusCooldownReduction, self.master, bonusCDR);
-                }
-            };
-
             RecalculateStatsAPI.GetStatCoefficients += (sender, args) =>
             {
                 if (sender.inventory && sender.master)
@@ -85,8 +66,6 @@ namespace LeagueItems
                     if (itemCount > 0)
                     {
                         float bonusCDR = CalculateBonusCooldownReduction(sender, itemCount);
-                        Utilities.SetValueInDictionary(ref bonusCooldownReduction, sender.master, bonusCDR);
-
                         args.cooldownMultAdd -= bonusCDR / 100f;
                     }
                 }
@@ -106,13 +85,17 @@ namespace LeagueItems
 #pragma warning disable Publicizer001
                     self.itemInventoryDisplay.itemIcons.ForEach(delegate (RoR2.UI.ItemIcon item)
                     {
-                        float bonusCDR = bonusCooldownReduction.TryGetValue(characterMaster.netId, out float _) ? bonusCooldownReduction[characterMaster.netId] : 0f;
+                        int itemCount = self.itemInventoryDisplay.inventory.GetItemCount(itemDef);
+
+                        float bonusCDR = CalculateBonusCooldownReduction(characterMaster.GetBody(), itemCount);
+
+                        string valueBaseDamageText = String.Format("{0:#.#}", bonusCDR);
 
                         if (item.itemIndex == itemDef.itemIndex)
                         {
                             item.tooltipProvider.overrideBodyText =
                                 Language.GetString(itemDef.descriptionToken)
-                                + "<br><br>Bonus Cooldown Reduction: " + String.Format("{0:#.#}%", bonusCDR);
+                                + "<br><br>Bonus Cooldown Reduction: " + valueBaseDamageText;
                         }
                     });
 #pragma warning restore Publicizer001

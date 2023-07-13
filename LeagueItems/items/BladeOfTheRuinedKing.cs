@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using R2API;
+using R2API.Networking;
+using R2API.Networking.Interfaces;
 using RoR2;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
-using System.Reflection;
-
-
+using UnityEngine.Networking;
 
 namespace LeagueItems
 {
@@ -16,14 +16,69 @@ namespace LeagueItems
 
         public static Color32 botrkColor = new Color32(40, 179, 191, 255);
 
-        // Deals 1.5% (+1.5% per stack) current health damage on-hit.
+        // Deals 1.5% (+1.5% per stack) current health damage on-hit. Capped at at least 1 per hit.
         public static float onHitDamageNumber = 1.5f;
         public static float onHitDamagePercent = onHitDamageNumber / 100f;
 
         private static DamageAPI.ModdedDamageType botrkDamageType;
         public static DamageColorIndex botrkDamageColor = DamageColorAPI.RegisterDamageColor(botrkColor);
 
-        public static Dictionary<UnityEngine.Networking.NetworkInstanceId, float> totalDamageDone = new Dictionary<UnityEngine.Networking.NetworkInstanceId, float>();
+        public class BladeStatistics : MonoBehaviour
+        {
+            private float _totalDamageDealt;
+            public float TotalDamageDealt
+            {
+                get { return _totalDamageDealt; }
+                set
+                {
+                    _totalDamageDealt = value;
+                    if (NetworkServer.active)
+                    {
+                        new BladeSync(gameObject.GetComponent<NetworkIdentity>().netId, value).Send(NetworkDestination.Clients);
+                    }
+                }
+            }
+
+            public class BladeSync : INetMessage
+            {
+                NetworkInstanceId objId;
+                float totalDamageDealt;
+
+                public BladeSync()
+                {
+                }
+
+                public BladeSync(NetworkInstanceId objId, float totalDamage)
+                {
+                    this.objId = objId;
+                    this.totalDamageDealt = totalDamage;
+                }
+
+                public void Deserialize(NetworkReader reader)
+                {
+                    objId = reader.ReadNetworkId();
+                    totalDamageDealt = reader.ReadSingle();
+                }
+
+                public void OnReceived()
+                {
+                    if (NetworkServer.active) return;
+
+                    GameObject obj = Util.FindNetworkObject(objId);
+                    if (obj)
+                    {
+                        BladeStatistics component = obj.GetComponent<BladeStatistics>();
+                        if (component) component.TotalDamageDealt = totalDamageDealt;
+                    }
+                }
+
+                public void Serialize(NetworkWriter writer)
+                {
+                    writer.Write(objId);
+                    writer.Write(totalDamageDealt);
+                }
+            }
+        }
 
         internal static void Init()
         {
@@ -32,6 +87,8 @@ namespace LeagueItems
 
             var displayRules = new ItemDisplayRuleDict(null);
             ItemAPI.Add(new CustomItem(itemDef, displayRules));
+
+            NetworkingAPI.RegisterMessageType<BladeStatistics.BladeSync>();
 
             botrkDamageType = DamageAPI.ReserveDamageType();
 
@@ -59,11 +116,18 @@ namespace LeagueItems
 
         private static void Hooks()
         {
+            CharacterMaster.onStartGlobal += (obj) =>
+            {
+                if (obj.inventory) obj.inventory.gameObject.AddComponent<BladeStatistics>();
+            };
+
             On.RoR2.GlobalEventManager.OnHitEnemy += (orig, self, damageInfo, victim) =>
             {
                 orig(self, damageInfo, victim);
 
-                if (!damageInfo.attacker)
+                if (!NetworkServer.active) return;
+
+                if (damageInfo.attacker == null || victim == null)
                 {
                     return;
                 }
@@ -81,22 +145,26 @@ namespace LeagueItems
                     {
                         float tempDamage = victimBody.healthComponent.health * damageInfo.procCoefficient * hyperbolicPercentage;
                         // Damage is capped at minimum of 1.0f
-                        float botrkDamage = tempDamage > 1 ? tempDamage : 1;
+                        float botrkDamage = tempDamage > 1f ? tempDamage : 1f;
 
-                        DamageInfo botrkProc = new DamageInfo();
-                        botrkProc.damage = botrkDamage;
-                        botrkProc.attacker = damageInfo.attacker;
-                        botrkProc.inflictor = damageInfo.attacker;
-                        botrkProc.procCoefficient = 0f;
-                        botrkProc.position = damageInfo.position;
-                        botrkProc.crit = false;
-                        botrkProc.damageColorIndex = botrkDamageColor;
-                        botrkProc.procChainMask = damageInfo.procChainMask;
-                        botrkProc.damageType = DamageType.Silent;
+                        DamageInfo botrkProc = new()
+                        {
+                            damage = botrkDamage,
+                            attacker = damageInfo.attacker,
+                            inflictor = damageInfo.attacker,
+                            procCoefficient = 0f,
+                            position = damageInfo.position,
+                            crit = false,
+                            damageColorIndex = botrkDamageColor,
+                            procChainMask = damageInfo.procChainMask,
+                            damageType = DamageType.Silent
+                        };
                         DamageAPI.AddModdedDamageType(botrkProc, botrkDamageType);
 
                         victimBody.healthComponent.TakeDamage(botrkProc);
-                        Utilities.AddValueInDictionary(ref totalDamageDone, attackerBody.master, botrkDamage);
+
+                        var itemStats = attackerBody.inventory.GetComponent<BladeStatistics>();
+                        itemStats.TotalDamageDealt += botrkDamage;
                     }
                 }
             };
@@ -113,19 +181,22 @@ namespace LeagueItems
                 if (self.itemInventoryDisplay && characterMaster)
                 {
 #pragma warning disable Publicizer001
-                    self.itemInventoryDisplay.itemIcons.ForEach(delegate (RoR2.UI.ItemIcon item)
+                    var itemStats = self.itemInventoryDisplay.inventory.GetComponent<BladeStatistics>();
+
+                    if (itemStats)
                     {
-                        float totalDamage = totalDamageDone.TryGetValue(characterMaster.netId, out float _) ? totalDamageDone[characterMaster.netId] : 0f;
-
-                        string valueDamageText = totalDamage == 0 ? "0" : String.Format("{0:#}", totalDamage);
-
-                        if (item.itemIndex == itemDef.itemIndex)
+                        self.itemInventoryDisplay.itemIcons.ForEach(delegate (RoR2.UI.ItemIcon item)
                         {
-                            item.tooltipProvider.overrideBodyText =
-                                Language.GetString(itemDef.descriptionToken)
-                                + "<br><br>Total Damage Done: " + valueDamageText;
-                        }
-                    });
+                            string valueDamageText = String.Format("{0:#}", itemStats.TotalDamageDealt);
+
+                            if (item.itemIndex == itemDef.itemIndex)
+                            {
+                                item.tooltipProvider.overrideBodyText =
+                                    Language.GetString(itemDef.descriptionToken)
+                                    + "<br><br>Total Damage Done: " + valueDamageText;
+                            }
+                        });
+                    }
 #pragma warning restore Publicizer001
                 }
             };

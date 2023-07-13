@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using R2API;
+using R2API.Networking;
+using R2API.Networking.Interfaces;
 using RoR2;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.Networking;
 
 namespace LeagueItems
 {
@@ -11,11 +14,11 @@ namespace LeagueItems
     {
         public static ItemDef itemDef;
 
-        // Gain 80% (+80% per stack) of your base health as bonus health.
-        public static float bonusHealthIncreaseNumber = 80f;
-        public static float bonusHealthIncreasePercent = bonusHealthIncreaseNumber / 100f;
-
-        public static Dictionary<UnityEngine.Networking.NetworkInstanceId, float> totalBonusHealth = new Dictionary<UnityEngine.Networking.NetworkInstanceId, float>();
+        // Gain 100% (+50% per stack) of your base health as bonus health.
+        public static float firstStackIncreaseNumber = 100f;
+        public static float firstStackIncreasePercent = firstStackIncreaseNumber / 100f;
+        public static float extraStackIncreaseNumber = 50f;
+        public static float extraStackIncreasePercent = extraStackIncreaseNumber / 100f;
 
         internal static void Init()
         {
@@ -47,6 +50,11 @@ namespace LeagueItems
             itemDef.hidden = false;
         }
 
+        public static float CalculateHealthIncreasePercent(CharacterBody sender, float itemCount)
+        {
+            return firstStackIncreasePercent + (itemCount - 1) * extraStackIncreasePercent;
+        }
+
         public static float CalculateHealthIncrease(CharacterBody sender, float itemCount)
         {
             float bonusesFromOtherItems = 0;
@@ -54,33 +62,17 @@ namespace LeagueItems
             if (sender.master.inventory.GetItemCount(Heartsteel.itemDef) > 0)
             {
                 // If the player has a Heartsteel in their inventory, we add the heartsteel bonus to the Warmog's calculation
-                bonusesFromOtherItems += (Heartsteel.totalHealthGained.TryGetValue(sender.master.netId, out float _) ? Heartsteel.totalHealthGained[sender.master.netId] : 0f);
+                var itemStats = sender.inventory.GetComponent<Heartsteel.HeartsteelStatistics>();
+                bonusesFromOtherItems += (itemStats.TotalBonusHealth);
             }
 
             // Calculate current base health before other base health bonuses
             float baseMaxHealth = sender.baseMaxHealth + (sender.level - 1) * sender.levelMaxHealth;
-            return (baseMaxHealth + bonusesFromOtherItems) * itemCount * bonusHealthIncreasePercent;
+            return (baseMaxHealth + bonusesFromOtherItems) * CalculateHealthIncreasePercent(sender, itemCount);
         }
 
         private static void Hooks()
         {
-            On.RoR2.CharacterBody.FixedUpdate += (orig, self) =>
-            {
-                orig(self);
-
-                if (!self || !self.inventory)
-                {
-                    return;
-                }
-
-                int itemCount = self.inventory.GetItemCount(itemDef);
-                if (itemCount > 0)
-                {
-                    float healthIncrease = CalculateHealthIncrease(self, itemCount);
-                    Utilities.SetValueInDictionary(ref totalBonusHealth, self.master, healthIncrease);
-                }
-            };
-
             RecalculateStatsAPI.GetStatCoefficients += (sender, args) =>
             {
                 if (sender.inventory && sender.master)
@@ -89,10 +81,7 @@ namespace LeagueItems
 
                     if (itemCount > 0)
                     {
-                        float healthIncrease = CalculateHealthIncrease(sender, itemCount);
-                        Utilities.SetValueInDictionary(ref totalBonusHealth, sender.master, healthIncrease);
-
-                        float warmogsBonusMultiplier = itemCount * bonusHealthIncreasePercent;
+                        float warmogsBonusMultiplier = CalculateHealthIncreasePercent(sender, itemCount);
                         args.healthMultAdd += warmogsBonusMultiplier;
                     }
                 }
@@ -112,14 +101,19 @@ namespace LeagueItems
 #pragma warning disable Publicizer001
                     self.itemInventoryDisplay.itemIcons.ForEach(delegate (RoR2.UI.ItemIcon item)
                     {
-                        float bonusHealth = totalBonusHealth.TryGetValue(characterMaster.netId, out float _) ? totalBonusHealth[characterMaster.netId] : 0f;
-                        float warmogsTotalBonus = self.itemInventoryDisplay.inventory.GetItemCount(itemDef) * bonusHealthIncreaseNumber;
+                        int itemCount = self.itemInventoryDisplay.inventory.GetItemCount(itemDef);
+                        
+                        float bonusHealthAmount = CalculateHealthIncrease(characterMaster.GetBody(), itemCount);
+                        float warmogsPercentageBonus = CalculateHealthIncreasePercent(characterMaster.GetBody(), itemCount) * 100f;
+
+                        string valueBonusHealthText = String.Format("{0:#}", bonusHealthAmount);
+                        string valueWarmogsPercentText = String.Format("({0:#}%)", warmogsPercentageBonus);
 
                         if (item.itemIndex == itemDef.itemIndex)
                         {
                             item.tooltipProvider.overrideBodyText =
                                 Language.GetString(itemDef.descriptionToken)
-                                + "<br><br>Total Bonus Health: " + String.Format("{0:#} ({1:#}%)", bonusHealth, warmogsTotalBonus);
+                                + "<br><br>Total Bonus Health: " + valueBonusHealthText + " " + valueWarmogsPercentText + " HP";
                         }
                     });
 #pragma warning restore Publicizer001
@@ -140,7 +134,7 @@ namespace LeagueItems
             LanguageAPI.Add("WAPickup", "Gain max health.");
 
             // The Description is where you put the actual numbers and give an advanced description.
-            LanguageAPI.Add("WADesc", "Gain <style=cIsHealth>" + bonusHealthIncreaseNumber + "%</style> <style=cStack>(+" + bonusHealthIncreaseNumber + "% per stack)</style> of your base health as bonus health.");
+            LanguageAPI.Add("WADesc", "Gain <style=cIsHealth>" + firstStackIncreaseNumber + "%</style> <style=cStack>(+" + extraStackIncreaseNumber + "% per stack)</style> of your base health as bonus health.");
 
             // The Lore is, well, flavor. You can write pretty much whatever you want here.
             LanguageAPI.Add("WALore", "The living armor protected the greatest troll warrior in the entire realm during the bloodiest and most devastating battles of the Rune Wars. " +
