@@ -14,8 +14,8 @@ namespace LeagueItems
     {
         public static ItemDef itemDef;
 
-        // Heal for 10% of damage dealt on-hit.
-        public static float bonusLifestealNumber = 10f;
+        // Heal for 18% of damage dealt on-hit.
+        public static float bonusLifestealNumber = 18f;
         public static float bonusLifestealPercent = bonusLifestealNumber / 100f;
 
         public class BloodthirsterStatistics : MonoBehaviour

@@ -14,12 +14,10 @@ namespace LeagueItems
     {
         public static ItemDef itemDef;
 
-        public static Color32 ragebladeColor = new Color32();
-
-        // Gain 6% (+6% per stack) crit chance and 16% (+16% per stack) crit damage.
-        public static float critChanceIncreaseNumber = 6f;
+        // Gain 60% (+60% per stack) crit chance and 60% (+60% per stack) crit damage.
+        public static float critChanceIncreaseNumber = 60f;
         public static float critChanceIncreasePercent = critChanceIncreaseNumber / 100f;
-        public static float critDamageIncreaseNumber = 16f;
+        public static float critDamageIncreaseNumber = 60f;
         public static float critDamageIncreasePercent = critDamageIncreaseNumber / 100f;
 
         internal static void Init()
@@ -44,7 +42,7 @@ namespace LeagueItems
             itemDef.loreToken = "IELore";
 
 #pragma warning disable Publicizer001
-            itemDef._itemTierDef = Addressables.LoadAssetAsync<ItemTierDef>("RoR2/Base/Common/Tier2Def.asset").WaitForCompletion();
+            itemDef._itemTierDef = Addressables.LoadAssetAsync<ItemTierDef>("RoR2/Base/Common/Tier3Def.asset").WaitForCompletion();
 #pragma warning restore Publicizer001
             itemDef.pickupIconSprite = LeagueItemsPlugin.MainAssets.LoadAsset<Sprite>("InfinityEdge.png");
             itemDef.pickupModelPrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Mystery/PickupMystery.prefab").WaitForCompletion();
@@ -126,7 +124,7 @@ namespace LeagueItems
             LanguageAPI.Add("IEToken", "Infinity Edge");
 
             // The Pickup is the short text that appears when you first pick this up. This text should be short and to the point, numbers are generally ommited.
-            LanguageAPI.Add("heartsteelPickup", "Gain crit chance and crit damage.");
+            LanguageAPI.Add("IEPickup", "Gain crit chance and crit damage.");
 
             // The Description is where you put the actual numbers and give an advanced description.
             LanguageAPI.Add("IEDesc", "Gain <style=cIsUtility>" + critChanceIncreaseNumber + "%</style> <style=cStack>(+" + critChanceIncreaseNumber + "% per stack)</style> crit chance "

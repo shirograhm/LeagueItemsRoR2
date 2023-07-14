@@ -53,6 +53,7 @@ namespace LeagueItems
             BladeOfTheRuinedKing.Init();
             Bloodthirster.Init();
             DeadMansPlate.Init();
+            DeathsDance.Init();
             Heartsteel.Init();
             InfinityEdge.Init();
             NashorsTooth.Init();
@@ -75,30 +76,27 @@ namespace LeagueItems
                 // And then drop our defined item in front of the player.
                 logger.LogMessage($"Player pressed F2. Spawning our custom item at coordinates {transform.position}.");
 
-                // Red Item Array
-                ItemIndex[] redItems = new ItemIndex[]
+                // All Items Array
+                ItemIndex[] allItems = new ItemIndex[]
                 {
                     BladeOfTheRuinedKing.itemDef.itemIndex,
                     Bloodthirster.itemDef.itemIndex,
                     DeadMansPlate.itemDef.itemIndex,
+                    DeathsDance.itemDef.itemIndex,
+                    // GuinsoosRageblade.itemDef.itemIndex,
                     Heartsteel.itemDef.itemIndex,
+                    InfinityEdge.itemDef.itemIndex,
                     NashorsTooth.itemDef.itemIndex,
                     SpearOfShojin.itemDef.itemIndex,
                     TitanicHydra.itemDef.itemIndex,
-                    WarmogsArmor.itemDef.itemIndex
-                };
-                // Green Item Array
-                ItemIndex[] greenItems = new ItemIndex[]
-                {
-                    InfinityEdge.itemDef.itemIndex
+                    WarmogsArmor.itemDef.itemIndex,
+                    // WitsEnd.itemDef.itemIndex
                 };
 
                 var random = new System.Random();
-                int redArrayIdx = random.Next(0, redItems.Length);
-                int greenArrayIdx = random.Next(0, greenItems.Length);
+                int arrayIdx = random.Next(0, allItems.Length);
 
-                PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(redItems[redArrayIdx]), transform.position, transform.forward * 20f);
-                PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(greenItems[greenArrayIdx]), transform.position, transform.forward * 20f);
+                PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(allItems[arrayIdx]), transform.position, transform.forward * 20f);
             }
         }
     }

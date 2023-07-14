@@ -70,6 +70,15 @@ namespace LeagueItems
                     1f,
                     statFormatter: DeadMansTotalFormatter
                 );
+                // Death's Dance
+                BetterUI.ItemStats.RegisterStat(
+                    itemDef: DeathsDance.itemDef,
+                    "Damage Reduction",
+                    DeathsDance.damageReductionIncreasePercent,
+                    DeathsDance.damageReductionIncreasePercent,
+                    stackingFormula: BetterUI.ItemStats.HyperbolicStacking,
+                    statFormatter: BetterUI.ItemStats.StatFormatter.Percent
+                );
                 // Heartsteel
                 BetterUI.ItemStats.RegisterStat(
                     itemDef: Heartsteel.itemDef,
@@ -258,7 +267,7 @@ namespace LeagueItems
                     if (!master.hasBody) return;
 
                     float onHitDamage = NashorsTooth.CalculateDamageOnHit(master.GetBody(), value);
-                    string valueDamageText = onHitDamage == 0 ? "0" : String.Format("{0:#}", onHitDamage);
+                    string valueDamageText = onHitDamage == 0 ? "0" : String.Format("{0:#.#}", onHitDamage);
 
                     sb.AppendFormat(valueDamageText);
                 }

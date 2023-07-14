@@ -16,10 +16,10 @@ namespace LeagueItems
 
         public static Color32 nashorsColor = new Color32(191, 10, 137, 255);
 
-        // Deals 5 ((+1 per stack) +0.5 per level) damage on-hit.
-        public static float firstStackMultiplier = 5f;
-        public static float extraStacksMultiplier = 1f;
-        public static float levelDamageMultiplier = 0.5f;
+        // Deals 6 ((+3 per stack) +1.5 per level) damage on-hit.
+        public static float firstStackMultiplier = 6f;
+        public static float extraStacksMultiplier = 3f;
+        public static float levelDamageMultiplier = 1.5f;
 
         public static DamageAPI.ModdedDamageType nashorsDamageType;
         public static DamageColorIndex nashorsDamageColor = DamageColorAPI.RegisterDamageColor(nashorsColor);
@@ -142,9 +142,9 @@ namespace LeagueItems
                 CharacterBody attackerBody = damageInfo.attacker.GetComponent<CharacterBody>();
                 CharacterBody victimBody = victim.GetComponent<CharacterBody>();
 
-                if (attackerBody?.inventory)
+                if (attackerBody && attackerBody.inventory)
                 {
-                    int itemCount = attackerBody.inventory.GetItemCount(itemDef.itemIndex);
+                    int itemCount = attackerBody.inventory.GetItemCount(itemDef);
                     // If the item is in the inventory and the on-hit multiplier is greater than 0
                     if (itemCount > 0 && damageInfo.procCoefficient > 0)
                     {
