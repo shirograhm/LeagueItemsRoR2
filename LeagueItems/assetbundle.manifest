@@ -1,34 +1,121 @@
 ManifestFileVersion: 0
-CRC: 2891148674
+CRC: 2234798401
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 4e7370ee499f7061ab36db3375f30d94
+    Hash: fdd699f94f5804488841db3b8947fa81
   TypeTreeHash:
     serializedVersion: 2
-    Hash: 011d1bb1b97750065fc8e33fbaec9bad
+    Hash: 21747e4ee48f36c7a65f9afbfd77f392
 HashAppended: 0
 ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
 - Class: 21
   Script: {instanceID: 0}
+- Class: 23
+  Script: {instanceID: 0}
 - Class: 28
+  Script: {instanceID: 0}
+- Class: 33
+  Script: {instanceID: 0}
+- Class: 43
   Script: {instanceID: 0}
 - Class: 48
   Script: {instanceID: 0}
 - Class: 213
   Script: {instanceID: 0}
 Assets:
+- Assets/Models/Prefabs/Item/InfinityEdge/Materials/Fuller_albedo.mat
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/Blade_metallic.jpeg
+- Assets/Models/Prefabs/Item/BotRK/textures/lambert1_Emissive.png
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/Wings_normal.png
+- Assets/Models/Prefabs/Item/BotRK/textures/lambert1_Normal_OpenGL.png
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/Core_AO.jpeg
 - Assets/Textures/Icons/Item/DeadMansPlate.png
-- Assets/Textures/Icons/Item/TrinityForce.png
-- Assets/Materials/Item/BotRK/BotRKMaterial.mat
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/Core_metallic.jpeg
+- Assets/Models/Prefabs/Item/BotRK/textures/lambert1_Roughness.png
+- Assets/Textures/Icons/Item/WitsEnd.png
+- Assets/Models/Prefabs/Item/SpearOfShojin/textures/Glaive_roughness.jpeg
+- Assets/Models/Prefabs/Item/SpearOfShojin/textures/internal_ground_ao_texture.jpeg
+- Assets/Models/Prefabs/Item/BotRK/textures/lambert1_Mixed_AO.png
+- Assets/Models/Prefabs/Item/InfinityEdge/Materials/Wings_albedo.mat
+- Assets/Textures/Icons/Buff/DeathsDanceBuff.png
+- Assets/Models/Prefabs/Item/BotRK/bladeoftheruinedking.prefab
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/Core_roughness.jpeg
+- Assets/Textures/Icons/Buff/DeadMansBuff.png
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/Fuller_roughness.jpeg
+- Assets/Models/Prefabs/Item/InfinityEdge/Materials/lambert1_albedo.mat
+- Assets/Models/Prefabs/Item/SpearOfShojin/textures/Glaive_normal.png
+- Assets/Models/Prefabs/Item/InfinityEdge/Materials/Runes_emissive.mat
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/lambert1_normal.png
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/Runes_AO.jpeg
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/Handle_normal.png
+- Assets/Models/Prefabs/Item/BotRK/Materials/blade_material.mat
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/Handle_AO.jpeg
+- Assets/Models/Prefabs/Item/SpearOfShojin/SpearOfShojin.prefab
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/Handle_roughness.jpeg
+- Assets/Models/Prefabs/Item/BotRK/textures/lambert1_Metallic.png
 - Assets/Textures/Icons/Item/DeathsDance.png
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/lambert1_roughness.jpeg
 - Assets/Textures/Icons/Item/NashorsTooth.png
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/H_Bevel_metallic.jpeg
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/Blade_AO.jpeg
+- Assets/Models/Prefabs/Item/InfinityEdge/Materials/Core_albedo.mat
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/Core_albedo.jpeg
 - Assets/Textures/Icons/Item/BotRK.png
+- Assets/Models/Prefabs/Item/InfinityEdge/Materials/H_Bevel_albedo.mat
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/Core_normal.png
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/lambert1_metallic.jpeg
+- Assets/Models/Prefabs/Item/SpearOfShojin/textures/Glaive_AO.jpeg
+- Assets/Models/Prefabs/Item/BotRK/textures/lambert1_Base_Color.png
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/Fuller_normal.png
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/Blade_emissive.jpeg
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/Handle_albedo.jpeg
+- Assets/Models/Prefabs/Item/BotRK/textures/lambert1_Normal.png
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/Fuller_AO.jpeg
+- Assets/Textures/Icons/Item/InfinityEdge.png
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/Fuller_metallic.jpeg
+- Assets/Models/Prefabs/Item/InfinityEdge/Materials/Handle_albedo.mat
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/G_Part_metallic.jpeg
+- Assets/Models/Prefabs/Item/InfinityEdge/Materials/Blade_albedo.mat
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/Blade_albedo.jpeg
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/Runes_metallic.jpeg
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/H_Bevel_AO.jpeg
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/Handle_metallic.jpeg
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/Blade_roughness.jpeg
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/G_Part_AO.jpeg
+- Assets/Models/Prefabs/Item/InfinityEdge/Materials/Runes_albedo.mat
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/H_Bevel_roughness.jpeg
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/Blade_normal.png
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/Runes_normal.png
 - Assets/Textures/Icons/Item/SpearofShojin.png
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/H_Bevel_albedo.jpeg
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/G_Part_normal.png
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/Wings_roughness.jpeg
 - Assets/Textures/Icons/Item/TitanicHydra.png
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/Runes_emissive.jpeg
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/H_Bevel_normal.png
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/Wings_metallic.jpeg
+- Assets/Models/Prefabs/Item/InfinityEdge/InfinityEdge.prefab
+- Assets/Models/Prefabs/Item/BotRK/textures/lambert1_Height.png
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/Runes_roughness.jpeg
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/Fuller_albedo.jpeg
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/lambert1_albedo.jpeg
+- Assets/Models/Prefabs/Item/SpearOfShojin/textures/Glaive_metallic.jpeg
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/Runes_albedo.jpeg
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/Wings_AO.jpeg
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/G_Part_albedo.jpeg
 - Assets/Textures/Icons/Item/WarmogsArmor.png
 - Assets/Textures/Icons/Item/GuinsoosRageblade.png
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/G_Part_roughness.jpeg
+- Assets/Models/Prefabs/Item/SpearOfShojin/textures/Glaive_albedo.jpeg
+- Assets/Models/Prefabs/Item/SpearOfShojin/Materials/Glaive_albedo.mat
 - Assets/Textures/Icons/Item/Bloodthirster.png
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/lambert1_AO.jpeg
 - Assets/Textures/Icons/Item/Heartsteel.png
-- Assets/Textures/Icons/Item/InfinityEdge.png
+- Assets/Models/Prefabs/Item/InfinityEdge/textures/Wings_albedo.jpeg
+- Assets/Models/Prefabs/Item/InfinityEdge/Materials/G_Part_albedo.mat
 Dependencies: []

@@ -102,9 +102,11 @@ namespace LeagueItems
             itemDef.descriptionToken = "HSDesc";
             itemDef.loreToken = "HSLore";
 
-#pragma warning disable Publicizer001
-            itemDef._itemTierDef = Addressables.LoadAssetAsync<ItemTierDef>("RoR2/Base/Common/Tier3Def.asset").WaitForCompletion();
-#pragma warning restore Publicizer001
+            ItemTierCatalog.availability.CallWhenAvailable(() =>
+            {
+                if (itemDef) itemDef.tier = ItemTier.Tier3;
+            });
+
             itemDef.pickupIconSprite = LeagueItemsPlugin.MainAssets.LoadAsset<Sprite>("Heartsteel.png");
             itemDef.pickupModelPrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Mystery/PickupMystery.prefab").WaitForCompletion();
             itemDef.canRemove = true;

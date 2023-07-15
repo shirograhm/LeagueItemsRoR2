@@ -46,6 +46,7 @@ namespace LeagueItems
                 }
             }
 
+            GenericGameEvents.Init();
             DamageColorAPI.Init();
 
             RoR2.ItemCatalog.availability.CallWhenAvailable(Integrations.Init);
@@ -97,6 +98,30 @@ namespace LeagueItems
                 int arrayIdx = random.Next(0, allItems.Length);
 
                 PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(allItems[arrayIdx]), transform.position, transform.forward * 20f);
+            }
+        }
+
+        public struct GenericCharacterInfo
+        {
+            public GameObject gameObject;
+            public CharacterBody body;
+            public CharacterMaster master;
+            public TeamComponent teamComponent;
+            public HealthComponent healthComponent;
+            public Inventory inventory;
+            public TeamIndex teamIndex;
+            public Vector3 aimOrigin;
+
+            public GenericCharacterInfo(CharacterBody body)
+            {
+                this.body = body;
+                gameObject = body ? body.gameObject : null;
+                master = body ? body.master : null;
+                teamComponent = body ? body.teamComponent : null;
+                healthComponent = body ? body.healthComponent : null;
+                inventory = master ? master.inventory : null;
+                teamIndex = teamComponent ? teamComponent.teamIndex : TeamIndex.Neutral;
+                aimOrigin = body ? body.aimOrigin : UnityEngine.Random.insideUnitSphere.normalized;
             }
         }
     }

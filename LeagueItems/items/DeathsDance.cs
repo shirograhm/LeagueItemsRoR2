@@ -13,16 +13,16 @@ namespace LeagueItems
     class DeathsDance
     {
         public static ItemDef itemDef;
-        public static BuffDef defianceBuff;
+        public static BuffDef dissentBuff;
 
         public static Color32 deathsDanceColor = new Color32(153, 22, 11, 255);
 
-        // Convert 25% (+25% per stack) of damage taken into stacks of Defiance (1 damage per stack).
-        // Defiance stacks are consumed as damage over time, but damage from Defiance stacks cannot exceed 5% of your max health per second.
-        // On elite enemy kill, cleanse all remaining Defiance stacks.
-        public const float MAX_DAMAGE_PER_SECOND = 5f;
+        // Convert 30% (+30% per stack) of damage taken into stacks of Dissent (each stack = 1 damage).
+        // Dissent stacks are consumed as damage over time, but damage from Dissent cannot exceed 1% of your max health per second.
+        public const float MAX_DAMAGE_PER_SECOND = 1f;
+        public const float MAX_DAMAGE_PER_SECOND_PERCENT = MAX_DAMAGE_PER_SECOND / 100f;
 
-        public static float damageReductionIncreaseNumber = 25f;
+        public static float damageReductionIncreaseNumber = 30f;
         public static float damageReductionIncreasePercent = damageReductionIncreaseNumber / 100f;
 
         public static float timeOfLastDefianceProc = 0f;
@@ -38,7 +38,7 @@ namespace LeagueItems
 
             var displayRules = new ItemDisplayRuleDict(null);
             ItemAPI.Add(new CustomItem(itemDef, displayRules));
-            ContentAddition.AddBuffDef(defianceBuff);
+            ContentAddition.AddBuffDef(dissentBuff);
 
             deathsDanceDamageType = DamageAPI.ReserveDamageType();
 
@@ -68,17 +68,22 @@ namespace LeagueItems
 
         private static void GenerateBuff()
         {
-            defianceBuff = ScriptableObject.CreateInstance<BuffDef>();
+            dissentBuff = ScriptableObject.CreateInstance<BuffDef>();
 
-            defianceBuff.name = "Defiance";
-            defianceBuff.buffColor = deathsDanceColor;
-            defianceBuff.iconSprite = Addressables.LoadAssetAsync<Sprite>("RoR2/Base/Common/MiscIcons/texMysteryIcon.png").WaitForCompletion();
-            defianceBuff.canStack = true;
+            dissentBuff.name = "Dissent";
+            dissentBuff.buffColor = deathsDanceColor;
+            dissentBuff.iconSprite = LeagueItemsPlugin.MainAssets.LoadAsset<Sprite>("DeathsDanceBuff.png");
+            dissentBuff.canStack = true;
         }
 
         public static float CalculateDamageReductionPercentage(int itemCount)
         {
             return 1 - (1 / (1 + (damageReductionIncreasePercent * itemCount)));
+        }
+
+        public static float CalculateMaximumDamagePerSecond(float healthAmount)
+        {
+            return healthAmount * MAX_DAMAGE_PER_SECOND_PERCENT;
         }
 
         private static void Hooks()
@@ -92,20 +97,15 @@ namespace LeagueItems
                     return;
                 }
 
-                if (self.HasBuff(defianceBuff) && timeOfLastDefianceProc + 1.0f <= Time.time)
+                if (self.HasBuff(dissentBuff) && timeOfLastDefianceProc + 1.0f <= Time.time)
                 {
-                    int defianceStackCount = self.GetBuffCount(defianceBuff);
-                    LeagueItemsPlugin.logger.LogDebug("Player currently has " + defianceStackCount + " stacks.");
-
-                    // Clamp damageToTake at a max of 5% max health
-                    int damageToTake = (int)Mathf.Clamp(defianceStackCount, 0, self.healthComponent.fullHealth * (MAX_DAMAGE_PER_SECOND / 100f));
-
-                    LeagueItemsPlugin.logger.LogDebug("Player tries to take " + damageToTake + " stacks of damage.");
-                    LeagueItemsPlugin.logger.LogDebug("Player can only take up to " + self.healthComponent.fullHealth * (MAX_DAMAGE_PER_SECOND / 100f) + " stacks of damage.");
+                    int dissentStackCount = self.GetBuffCount(dissentBuff);
+                    // Clamp damageToTake
+                    int damageToTake = (int) Mathf.Clamp(dissentStackCount, 0, CalculateMaximumDamagePerSecond(self.healthComponent.fullHealth));
 
                     DamageInfo info = new()
                     {
-                        damage = damageToTake,
+                        damage = damageToTake * 2,   // Why is this x2? Because it works for some reason. Without this the damage is halved by something.
                         attacker = self.gameObject,
                         procCoefficient = 0f,
                         position = self.corePosition,
@@ -118,7 +118,7 @@ namespace LeagueItems
                     self.healthComponent.TakeDamage(info);
 
 #pragma warning disable Publicizer001 // Accessing a member that was not originally public
-                    self.SetBuffCount(defianceBuff.buffIndex, defianceStackCount - damageToTake);
+                    self.SetBuffCount(dissentBuff.buffIndex, dissentStackCount - damageToTake);
 #pragma warning restore Publicizer001 // Accessing a member that was not originally public
 
                     timeOfLastDefianceProc = Time.time;
@@ -142,41 +142,39 @@ namespace LeagueItems
 
                     if (itemCount > 0 && damageReport.victimIsElite)
                     {
-                        if (damageReport.attackerBody.GetBuffCount(defianceBuff) > 0)
+                        if (damageReport.attackerBody.GetBuffCount(dissentBuff) > 0)
                         {
 #pragma warning disable Publicizer001 // Accessing a member that was not originally public
-                            damageReport.attackerBody.SetBuffCount(defianceBuff.buffIndex, 0);
+                            damageReport.attackerBody.SetBuffCount(dissentBuff.buffIndex, 0);
 #pragma warning restore Publicizer001 // Accessing a member that was not originally public
                         }
                     }
                 }
             };
 
-            On.RoR2.GlobalEventManager.OnHitEnemy += (orig, self, damageInfo, victim) =>
+            GenericGameEvents.BeforeTakeDamage += (damageInfo, attackerInfo, victimInfo) =>
             {
-                orig(self, damageInfo, victim);
-
-                if (!NetworkServer.active) return;
-
-                CharacterBody victimBody = victim.GetComponent<CharacterBody>();
-
-                if (victimBody && victimBody.inventory)
+                if (victimInfo.inventory)
                 {
-                    int itemCount = victimBody.inventory.GetItemCount(itemDef);
+                    int itemCount = victimInfo.inventory.GetItemCount(itemDef);
 
-                    if (itemCount > 0 && !damageInfo.HasModdedDamageType(deathsDanceDamageType)) // TODO Fix deaths dance reducing its own damage
+                    if (itemCount > 0 && !damageInfo.HasModdedDamageType(deathsDanceDamageType))
                     {
+                        // Reduce damage before damage application
                         float damageTurnedIntoDefiance = damageInfo.damage * CalculateDamageReductionPercentage(itemCount);
                         damageInfo.damage -= damageTurnedIntoDefiance;
 
-                        int currentDefiance = victimBody.GetBuffCount(defianceBuff);
-                        currentDefiance += (int)damageTurnedIntoDefiance;
+                        int oldDefiance = victimInfo.body.GetBuffCount(dissentBuff);
+                        int newDefiance = oldDefiance + (int)damageTurnedIntoDefiance;
                         // Set stacks equal to total stacks plus stacks gained
 #pragma warning disable Publicizer001 // Accessing a member that was not originally public
-                        victimBody.SetBuffCount(defianceBuff.buffIndex, currentDefiance);
+                        victimInfo.body.SetBuffCount(dissentBuff.buffIndex, newDefiance);
 #pragma warning restore Publicizer001 // Accessing a member that was not originally public
 
-                        timeOfLastDefianceProc = Time.time;
+                        if (oldDefiance == 0)
+                        {
+                            timeOfLastDefianceProc = Time.time;
+                        }
                     }
                 }
             };
