@@ -16,10 +16,10 @@ namespace LeagueItems
 
         public static Color32 nashorsColor = new Color32(191, 10, 137, 255);
 
-        // Deals 6 ((+3 per stack) +1.5 per level) damage on-hit.
-        public static float firstStackMultiplier = 6f;
-        public static float extraStacksMultiplier = 3f;
-        public static float levelDamageMultiplier = 1.5f;
+        // Deals 15 ((+5 per stack) +1 per level) damage on-hit.
+        public static float firstStackMultiplier = 15f;
+        public static float extraStacksMultiplier = 5f;
+        public static float levelDamageMultiplier = 1f;
 
         public static DamageAPI.ModdedDamageType nashorsDamageType;
         public static DamageColorIndex nashorsDamageColor = DamageColorAPI.RegisterDamageColor(nashorsColor);
@@ -133,9 +133,7 @@ namespace LeagueItems
             {
                 orig(self, damageInfo, victim);
 
-                if (!NetworkServer.active) return;
-
-                if (damageInfo.attacker == null || victim == null)
+                if (!NetworkServer.active || damageInfo.attacker == null || victim == null)
                 {
                     return;
                 }
@@ -146,11 +144,10 @@ namespace LeagueItems
                 if (attackerBody && attackerBody.inventory)
                 {
                     int itemCount = attackerBody.inventory.GetItemCount(itemDef);
-                    // If the item is in the inventory and the on-hit multiplier is greater than 0
+                    // If the item is in the inventory and the on-hit chance is greater than 0
                     if (itemCount > 0 && damageInfo.procCoefficient > 0)
                     {
-                        float damageOnHit = CalculateDamageOnHit(attackerBody, itemCount);
-                        float nashorsDamage = damageInfo.procCoefficient * damageOnHit;
+                        float nashorsDamage = CalculateDamageOnHit(attackerBody, itemCount);
 
                         DamageInfo nashorsProc = new()
                         {
@@ -226,8 +223,8 @@ namespace LeagueItems
             LanguageAPI.Add("NTPickup", "Deal flat damage on-hit.");
 
             // The Description is where you put the actual numbers and give an advanced description.
-            LanguageAPI.Add("NTDesc", "Deal <style=cIsDamage>" + firstStackMultiplier + "</style> (<style=cStack>(+" + extraStacksMultiplier + " per stack)</style> "
-                                       + "+<style=cStack>" + levelDamageMultiplier + "</style> per level) damage on-hit.");
+            LanguageAPI.Add("NTDesc", "Deal <style=cIsDamage>" + firstStackMultiplier + "</style> (<style=cStack>(+" + extraStacksMultiplier + " per stack) "
+                                       + "+" + levelDamageMultiplier + " per level</style>) damage on-hit.");
 
             // The Lore is, well, flavor. You can write pretty much whatever you want here.
             LanguageAPI.Add("NTLore", "A sword belonging to the Shadow Isles.");

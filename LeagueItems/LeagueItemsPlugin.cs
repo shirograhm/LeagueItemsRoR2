@@ -2,9 +2,11 @@ using BepInEx;
 using R2API;
 using RoR2;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
+using UnityEngine.Networking;
 using System;
+using System.Linq;
 using System.Reflection;
+using System.Collections.Generic;
 
 namespace LeagueItems
 {
@@ -46,6 +48,8 @@ namespace LeagueItems
                 }
             }
 
+            On.RoR2.Items.ContagiousItemManager.Init += InjectVoidItems;
+
             GenericGameEvents.Init();
             DamageColorAPI.Init();
 
@@ -55,19 +59,46 @@ namespace LeagueItems
             Bloodthirster.Init();
             DeadMansPlate.Init();
             DeathsDance.Init();
+            GuinsoosRageblade.Init();
             Heartsteel.Init();
             InfinityEdge.Init();
             NashorsTooth.Init();
             SpearOfShojin.Init();
             TitanicHydra.Init();
             WarmogsArmor.Init();
+            WitsEnd.Init();
 
             logger.LogMessage(nameof(Awake) + " done.");
         }
-       
+
+        private void InjectVoidItems(On.RoR2.Items.ContagiousItemManager.orig_Init orig)
+        {
+            List<ItemDef.Pair> newVoidPairs = new List<ItemDef.Pair>();
+
+            Debug.Log("Injecting LeagueMod item corruption...");
+            // Nashor's => Guinsoo's
+            newVoidPairs.Add(new ItemDef.Pair() {
+                itemDef1 = NashorsTooth.itemDef,
+                itemDef2 = GuinsoosRageblade.itemDef
+            });
+            
+            var key = DLC1Content.ItemRelationshipTypes.ContagiousItem;
+            Debug.Log(key);
+#pragma warning disable Publicizer001 // Accessing a member that was not originally public
+            var voidPairs = ItemCatalog.itemRelationships[DLC1Content.ItemRelationshipTypes.ContagiousItem];
+            ItemCatalog.itemRelationships[DLC1Content.ItemRelationshipTypes.ContagiousItem] = voidPairs.Union(newVoidPairs).ToArray();
+#pragma warning restore Publicizer001 // Accessing a member that was not originally public
+
+            Debug.Log("Finished injecting LeagueMod item transformations.");
+
+            orig();
+        }
+
         // The Update() method is run on every frame of the game.
         private void Update()
         {
+            if (!NetworkServer.active) { return; }
+
             // This if statement checks if the player has currently pressed F2.
             if (Input.GetKeyDown(KeyCode.F2))
             {
@@ -75,7 +106,7 @@ namespace LeagueItems
                 var transform = PlayerCharacterMasterController.instances[0].master.GetBodyObject().transform;
 
                 // And then drop our defined item in front of the player.
-                logger.LogMessage($"Player pressed F2. Spawning our custom item at coordinates {transform.position}.");
+                logger.LogMessage($"Player pressed F2. Spawning a random League item at coordinates {transform.position}.");
 
                 // All Items Array
                 ItemIndex[] allItems = new ItemIndex[]
@@ -84,20 +115,31 @@ namespace LeagueItems
                     Bloodthirster.itemDef.itemIndex,
                     DeadMansPlate.itemDef.itemIndex,
                     DeathsDance.itemDef.itemIndex,
-                    // GuinsoosRageblade.itemDef.itemIndex,
+                    GuinsoosRageblade.itemDef.itemIndex,
                     Heartsteel.itemDef.itemIndex,
                     InfinityEdge.itemDef.itemIndex,
                     NashorsTooth.itemDef.itemIndex,
                     SpearOfShojin.itemDef.itemIndex,
                     TitanicHydra.itemDef.itemIndex,
                     WarmogsArmor.itemDef.itemIndex,
-                    // WitsEnd.itemDef.itemIndex
+                    WitsEnd.itemDef.itemIndex
                 };
 
                 var random = new System.Random();
                 int arrayIdx = random.Next(0, allItems.Length);
 
-                PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(allItems[arrayIdx]), transform.position, transform.forward * 20f);
+                PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(allItems[arrayIdx]), transform.position, transform.forward * 20f);   
+            }
+
+            if (Input.GetKeyDown(KeyCode.F3))
+            {
+                // Get the player body to use a position:
+                var transform = PlayerCharacterMasterController.instances[0].master.GetBodyObject().transform;
+
+                // And then drop our defined item in front of the player.
+                logger.LogMessage($"Player pressed F3. Spawning Guinsoo's Rageblade at coordinates {transform.position}.");
+
+                PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(GuinsoosRageblade.itemDef.itemIndex), transform.position, transform.forward * 20f);
             }
         }
 

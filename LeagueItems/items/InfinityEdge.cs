@@ -14,8 +14,8 @@ namespace LeagueItems
     {
         public static ItemDef itemDef;
 
-        // Gain 60% (+60% per stack) crit chance and 60% (+60% per stack) crit damage.
-        public static float critChanceIncreaseNumber = 60f;
+        // Gain 30% (+30% per stack) crit chance and 60% (+60% per stack) crit damage.
+        public static float critChanceIncreaseNumber = 30f;
         public static float critChanceIncreasePercent = critChanceIncreaseNumber / 100f;
         public static float critDamageIncreaseNumber = 60f;
         public static float critDamageIncreasePercent = critDamageIncreaseNumber / 100f;

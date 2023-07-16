@@ -14,8 +14,8 @@ namespace LeagueItems
     {
         public static ItemDef itemDef;
 
-        // Upon killing an elite enemy, gain 3% (+1.5% per stack) of your max health as permanent base health, up to a max of 500 (+500 per stack) bonus base health.
-        public const float MAX_HEALTH_BONUS_PER_STACK = 500f;
+        // Upon killing an elite enemy, gain 3% (+1.5% per stack) of your max health as permanent base health, up to a max of 600 (+600 per stack) bonus base health.
+        public const float MAX_HEALTH_BONUS_PER_STACK = 600f;
         
         public static float firstStackIncreaseNumber = 3f;
         public static float firstStackIncreasePercent = firstStackIncreaseNumber / 100f;

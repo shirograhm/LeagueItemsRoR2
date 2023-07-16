@@ -91,8 +91,6 @@ namespace LeagueItems
 
         internal static void Init()
         {
-            NetworkingAPI.RegisterMessageType<DeadMansStatistics.DeadMansSync>();
-
             GenerateItem();
             GenerateBuff();
             AddTokens();
@@ -124,7 +122,7 @@ namespace LeagueItems
             });
 
             itemDef.pickupIconSprite = LeagueItemsPlugin.MainAssets.LoadAsset<Sprite>("DeadMansPlate.png");
-            itemDef.pickupModelPrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Mystery/PickupMystery.prefab").WaitForCompletion();
+            itemDef.pickupModelPrefab = LeagueItemsPlugin.MainAssets.LoadAsset<GameObject>("DeadMansPlate.prefab");
             itemDef.canRemove = true;
             itemDef.hidden = false;
         }
@@ -134,7 +132,6 @@ namespace LeagueItems
             momentumBuff = ScriptableObject.CreateInstance<BuffDef>();
 
             momentumBuff.name = "Momentum";
-            momentumBuff.buffColor = deadmansColor;
             momentumBuff.iconSprite = LeagueItemsPlugin.MainAssets.LoadAsset<Sprite>("DeadMansBuff.png");
             momentumBuff.canStack = true;
         }
@@ -180,6 +177,12 @@ namespace LeagueItems
                         }
                     }
                 }
+                else
+                {
+#pragma warning disable Publicizer001 // Accessing a member that was not originally public
+                    self.SetBuffCount(momentumBuff.buffIndex, 0);
+#pragma warning restore Publicizer001 // Accessing a member that was not originally public
+                }
             };
 
             RecalculateStatsAPI.GetStatCoefficients += (sender, args) =>
@@ -213,12 +216,12 @@ namespace LeagueItems
                 if (attackerBody?.inventory)
                 {
                     int itemCount = attackerBody.inventory.GetItemCount(itemDef.itemIndex);
-                    // If the item is in the inventory and the on-hit multiplier is greater than 0
+                    // If the item is in the inventory and the on-hit chance is greater than 0
                     if (itemCount > 0 && damageInfo.procCoefficient > 0 &&
                         attackerBody.GetBuffCount(momentumBuff) == MAX_MOMENTUM_STACKS)
                     {
                         float damageProc = CalculateDamageProc(attackerBody, itemCount);
-                        float deadMansDamage = damageInfo.procCoefficient * damageProc;
+                        float deadMansDamage = damageProc;
 
                         DamageInfo deadMansProc = new()
                         {
@@ -299,8 +302,9 @@ namespace LeagueItems
             LanguageAPI.Add("DMPPickup", "Gain stacking movement speed over time. Expend max stacks to deal bonus damage on-hit.");
 
             // The Description is where you put the actual numbers and give an advanced description.
-            LanguageAPI.Add("DMPDesc", "Gain a stack of Momentum every second, up to a maximum of <style=cIsUtility>" + MAX_MOMENTUM_STACKS + "</style>. Each stack gives <style=cIsUtility>" + movementSpeedPerStack + "%</style> movement speed. "
-                                        + "Once fully stacked, expend all stacks to deal <style=cIsDamage>" + bonusDamagePerItemStack + "%</style> <style=cStack>(+" + bonusDamagePerItemStack + "% per stack)</style> bonus on-hit damage.");
+            LanguageAPI.Add("DMPDesc", "Gain a stack of Momentum every second, up to a maximum of <style=cIsUtility>" + MAX_MOMENTUM_STACKS + "</style>. " +
+                "Each stack gives <style=cIsUtility>" + movementSpeedPerStack + "%</style> movement speed. " +
+                "Once fully stacked, expend all stacks to deal <style=cIsDamage>" + bonusDamagePerItemStack + "%</style> <style=cStack>(+" + bonusDamagePerItemStack + "% per stack)</style> bonus on-hit damage.");
 
             // The Lore is, well, flavor. You can write pretty much whatever you want here.
             LanguageAPI.Add("DMPLore", "The plate armor of a dead man.");

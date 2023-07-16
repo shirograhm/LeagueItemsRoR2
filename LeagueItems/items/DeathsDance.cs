@@ -13,13 +13,14 @@ namespace LeagueItems
     class DeathsDance
     {
         public static ItemDef itemDef;
-        public static BuffDef dissentBuff;
+        public static BuffDef defianceBuff;
 
         public static Color32 deathsDanceColor = new Color32(153, 22, 11, 255);
 
-        // Convert 30% (+30% per stack) of damage taken into stacks of Dissent (each stack = 1 damage).
-        // Dissent stacks are consumed as damage over time, but damage from Dissent cannot exceed 1% of your max health per second.
-        public const float MAX_DAMAGE_PER_SECOND = 1f;
+        // Convert 25% (+25% per stack) of damage taken into stacks of Defiance (each stack = 1 damage).
+        // Defiance stacks are consumed as damage over time, but damage from Defiance cannot exceed 2% of your max health per second.
+        // Cleanse all remaining stacks when killing an elite enemy.
+        public const float MAX_DAMAGE_PER_SECOND = 2f;
         public const float MAX_DAMAGE_PER_SECOND_PERCENT = MAX_DAMAGE_PER_SECOND / 100f;
 
         public static float damageReductionIncreaseNumber = 30f;
@@ -30,6 +31,114 @@ namespace LeagueItems
         private static DamageAPI.ModdedDamageType deathsDanceDamageType;
         public static DamageColorIndex deathsDanceDamageColor = DamageColorAPI.RegisterDamageColor(deathsDanceColor);
 
+        public class DeathsDanceStatistics : MonoBehaviour
+        {
+            private float _totalDamageTaken;
+            public float TotalDamageTaken
+            {
+                get { return _totalDamageTaken; }
+                set
+                {
+                    _totalDamageTaken = value;
+                    if (NetworkServer.active)
+                    {
+                        new DamageTakenSync(gameObject.GetComponent<NetworkIdentity>().netId, value).Send(NetworkDestination.Clients);
+                    }
+                }
+            }
+            private float _totalDamageCleansed;
+            public float TotalDamageCleansed
+            {
+                get { return _totalDamageCleansed; }
+                set
+                {
+                    _totalDamageCleansed = value;
+                    if (NetworkServer.active)
+                    {
+                        new DamageCleansedSync(gameObject.GetComponent<NetworkIdentity>().netId, value).Send(NetworkDestination.Clients);
+                    }
+                }
+            }
+
+            public class DamageTakenSync : INetMessage
+            {
+                NetworkInstanceId objId;
+                float totalDamageTaken;
+
+                public DamageTakenSync() { }
+                
+                public DamageTakenSync(NetworkInstanceId objId, float totalTaken)
+                {
+                    this.objId = objId;
+                    this.totalDamageTaken = totalTaken;
+                }
+
+                public void Deserialize(NetworkReader reader)
+                {
+                    objId = reader.ReadNetworkId();
+                    totalDamageTaken = reader.ReadSingle();
+                }
+
+                public void OnReceived()
+                {
+                    if (NetworkServer.active) return;
+
+                    GameObject obj = Util.FindNetworkObject(objId);
+                    if (obj)
+                    {
+                        DeathsDanceStatistics component = obj.GetComponent<DeathsDanceStatistics>();
+                        if (component) component.TotalDamageTaken = totalDamageTaken;
+                    }
+                }
+
+                public void Serialize(NetworkWriter writer)
+                {
+                    writer.Write(objId);
+                    writer.Write(totalDamageTaken);
+                }
+            }
+
+            public class DamageCleansedSync : INetMessage
+            {
+                NetworkInstanceId objId;
+                float totalDamageCleansed;
+
+                public DamageCleansedSync()
+                {
+                }
+
+                public DamageCleansedSync(NetworkInstanceId objId, float totalDamage)
+                {
+                    this.objId = objId;
+                    this.totalDamageCleansed = totalDamage;
+                }
+
+                public void Deserialize(NetworkReader reader)
+                {
+                    objId = reader.ReadNetworkId();
+                    totalDamageCleansed = reader.ReadSingle();
+                }
+
+                public void OnReceived()
+                {
+                    if (NetworkServer.active) return;
+
+                    GameObject obj = Util.FindNetworkObject(objId);
+                    if (obj)
+                    {
+                        DeathsDanceStatistics component = obj.GetComponent<DeathsDanceStatistics>();
+                        if (component) component.TotalDamageCleansed = totalDamageCleansed;
+                    }
+                }
+
+                public void Serialize(NetworkWriter writer)
+                {
+                    writer.Write(objId);
+                    writer.Write(totalDamageCleansed);
+                }
+            }
+        }
+
         internal static void Init()
         {
             GenerateItem();
@@ -38,7 +147,10 @@ namespace LeagueItems
 
             var displayRules = new ItemDisplayRuleDict(null);
             ItemAPI.Add(new CustomItem(itemDef, displayRules));
-            ContentAddition.AddBuffDef(dissentBuff);
+            ContentAddition.AddBuffDef(defianceBuff);
+
+            NetworkingAPI.RegisterMessageType<DeathsDanceStatistics.DamageTakenSync>();
+            NetworkingAPI.RegisterMessageType<DeathsDanceStatistics.DamageCleansedSync>();
 
             deathsDanceDamageType = DamageAPI.ReserveDamageType();
 
@@ -68,12 +180,11 @@ namespace LeagueItems
 
         private static void GenerateBuff()
         {
-            dissentBuff = ScriptableObject.CreateInstance<BuffDef>();
+            defianceBuff = ScriptableObject.CreateInstance<BuffDef>();
 
-            dissentBuff.name = "Dissent";
-            dissentBuff.buffColor = deathsDanceColor;
-            dissentBuff.iconSprite = LeagueItemsPlugin.MainAssets.LoadAsset<Sprite>("DeathsDanceBuff.png");
-            dissentBuff.canStack = true;
+            defianceBuff.name = "Defiance";
+            defianceBuff.iconSprite = LeagueItemsPlugin.MainAssets.LoadAsset<Sprite>("DeathsDanceBuff.png");
+            defianceBuff.canStack = true;
         }
 
         public static float CalculateDamageReductionPercentage(int itemCount)
@@ -88,6 +199,11 @@ namespace LeagueItems
 
         private static void Hooks()
         {
+            CharacterMaster.onStartGlobal += (obj) =>
+            {
+                if (obj.inventory) obj.inventory.gameObject.AddComponent<DeathsDanceStatistics>();
+            };
+
             On.RoR2.CharacterBody.Update += (orig, self) =>
             {
                 orig(self);
@@ -97,28 +213,31 @@ namespace LeagueItems
                     return;
                 }
 
-                if (self.HasBuff(dissentBuff) && timeOfLastDefianceProc + 1.0f <= Time.time)
+                if (self.HasBuff(defianceBuff) && timeOfLastDefianceProc + 1.0f <= Time.time)
                 {
-                    int dissentStackCount = self.GetBuffCount(dissentBuff);
+                    int defianceStackCount = self.GetBuffCount(defianceBuff);
                     // Clamp damageToTake
-                    int damageToTake = (int) Mathf.Clamp(dissentStackCount, 0, CalculateMaximumDamagePerSecond(self.healthComponent.fullHealth));
+                    int damageToTake = (int)Mathf.Clamp(defianceStackCount, 0, CalculateMaximumDamagePerSecond(self.healthComponent.fullHealth)) * 2;
 
                     DamageInfo info = new()
                     {
-                        damage = damageToTake * 2,   // Why is this x2? Because it works for some reason. Without this the damage is halved by something.
+                        damage = damageToTake,
                         attacker = self.gameObject,
                         procCoefficient = 0f,
                         position = self.corePosition,
                         crit = false,
                         damageColorIndex = deathsDanceDamageColor,
-                        damageType = DamageType.Silent
+                        damageType = DamageType.BypassBlock | DamageType.BypassArmor | DamageType.BypassOneShotProtection   // Damage ignores armor stat and flat damage reduction
                     };
                     DamageAPI.AddModdedDamageType(info, deathsDanceDamageType);
 
                     self.healthComponent.TakeDamage(info);
 
+                    var itemStats = self.inventory.GetComponent<DeathsDanceStatistics>();
+                    itemStats.TotalDamageTaken += damageToTake;
+
 #pragma warning disable Publicizer001 // Accessing a member that was not originally public
-                    self.SetBuffCount(dissentBuff.buffIndex, dissentStackCount - damageToTake);
+                    self.SetBuffCount(defianceBuff.buffIndex, defianceStackCount - damageToTake);
 #pragma warning restore Publicizer001 // Accessing a member that was not originally public
 
                     timeOfLastDefianceProc = Time.time;
@@ -142,10 +261,15 @@ namespace LeagueItems
 
                     if (itemCount > 0 && damageReport.victimIsElite)
                     {
-                        if (damageReport.attackerBody.GetBuffCount(dissentBuff) > 0)
+                        int stackCount = damageReport.attackerBody.GetBuffCount(defianceBuff);
+
+                        if (stackCount > 0)
                         {
+                            var itemStats = damageReport.attackerBody.inventory.GetComponent<DeathsDanceStatistics>();
+                            itemStats.TotalDamageCleansed += stackCount;
+
 #pragma warning disable Publicizer001 // Accessing a member that was not originally public
-                            damageReport.attackerBody.SetBuffCount(dissentBuff.buffIndex, 0);
+                            damageReport.attackerBody.SetBuffCount(defianceBuff.buffIndex, 0);
 #pragma warning restore Publicizer001 // Accessing a member that was not originally public
                         }
                     }
@@ -164,11 +288,11 @@ namespace LeagueItems
                         float damageTurnedIntoDefiance = damageInfo.damage * CalculateDamageReductionPercentage(itemCount);
                         damageInfo.damage -= damageTurnedIntoDefiance;
 
-                        int oldDefiance = victimInfo.body.GetBuffCount(dissentBuff);
+                        int oldDefiance = victimInfo.body.GetBuffCount(defianceBuff);
                         int newDefiance = oldDefiance + (int)damageTurnedIntoDefiance;
                         // Set stacks equal to total stacks plus stacks gained
 #pragma warning disable Publicizer001 // Accessing a member that was not originally public
-                        victimInfo.body.SetBuffCount(dissentBuff.buffIndex, newDefiance);
+                        victimInfo.body.SetBuffCount(defianceBuff.buffIndex, newDefiance);
 #pragma warning restore Publicizer001 // Accessing a member that was not originally public
 
                         if (oldDefiance == 0)
@@ -189,12 +313,12 @@ namespace LeagueItems
             LanguageAPI.Add("DDToken", "Death's Dance");
 
             // The Pickup is the short text that appears when you first pick this up. This text should be short and to the point, numbers are generally ommited.
-            LanguageAPI.Add("DDPickup", "Gain damage reduction, but enemies deal additional damage on-hit.");
+            LanguageAPI.Add("DDPickup", "Convert a portion of damage taken into damage taken over time. Cleanse remaining damage when killing an elite enemy.");
 
             // The Description is where you put the actual numbers and give an advanced description.
-            LanguageAPI.Add("DDDesc", "Convert <style=cIsDamage>" + damageReductionIncreaseNumber + "%</style> <style=cStack>(+" + damageReductionIncreaseNumber + "% per stack)</style> of damage taken into stacks of Defiance (1 damage per stack)."
-                            + " Defiance stacks are consumed as damage over time, but damage from Defiance stacks cannot exceed <style=cIsUtility>" + MAX_DAMAGE_PER_SECOND + "%</style> of your max health per second."
-                            + " On elite enemy kill, cleanse all remaining Defiance stacks.");
+            LanguageAPI.Add("DDDesc", "Convert <style=cIsUtility>" + damageReductionIncreaseNumber + "%</style> <style=cStack>(+" + damageReductionIncreaseNumber + "% per stack)</style> of damage taken into stacks of Defiance (1 damage per stack)."
+                            + " Defiance stacks are consumed as damage over time, but damage from Defiance stacks cannot exceed <style=cIsDamage>" + MAX_DAMAGE_PER_SECOND + "%</style> of your max health per second."
+                            + " When you kill an elite enemy, cleanse all remaining stacks.");
 
             // The Lore is, well, flavor. You can write pretty much whatever you want here.
             LanguageAPI.Add("DDLore", "Death's Dance lore.");

@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 2234798401
+CRC: 3010219012
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: fdd699f94f5804488841db3b8947fa81
+    Hash: 1e18c2ccdbef78591e405ec79218950e
   TypeTreeHash:
     serializedVersion: 2
     Hash: 21747e4ee48f36c7a65f9afbfd77f392
@@ -35,6 +35,7 @@ Assets:
 - Assets/Models/Prefabs/Item/BotRK/textures/lambert1_Normal_OpenGL.png
 - Assets/Models/Prefabs/Item/InfinityEdge/textures/Core_AO.jpeg
 - Assets/Textures/Icons/Item/DeadMansPlate.png
+- Assets/Models/Prefabs/Item/DeadMansPlate/DeadMansPlate.prefab
 - Assets/Models/Prefabs/Item/InfinityEdge/textures/Core_metallic.jpeg
 - Assets/Models/Prefabs/Item/BotRK/textures/lambert1_Roughness.png
 - Assets/Textures/Icons/Item/WitsEnd.png
@@ -42,10 +43,9 @@ Assets:
 - Assets/Models/Prefabs/Item/SpearOfShojin/textures/internal_ground_ao_texture.jpeg
 - Assets/Models/Prefabs/Item/BotRK/textures/lambert1_Mixed_AO.png
 - Assets/Models/Prefabs/Item/InfinityEdge/Materials/Wings_albedo.mat
-- Assets/Textures/Icons/Buff/DeathsDanceBuff.png
+- Assets/Models/Prefabs/Item/DeadMansPlate/textures/material_0_normal.png
 - Assets/Models/Prefabs/Item/BotRK/bladeoftheruinedking.prefab
 - Assets/Models/Prefabs/Item/InfinityEdge/textures/Core_roughness.jpeg
-- Assets/Textures/Icons/Buff/DeadMansBuff.png
 - Assets/Models/Prefabs/Item/InfinityEdge/textures/Fuller_roughness.jpeg
 - Assets/Models/Prefabs/Item/InfinityEdge/Materials/lambert1_albedo.mat
 - Assets/Models/Prefabs/Item/SpearOfShojin/textures/Glaive_normal.png
@@ -85,16 +85,21 @@ Assets:
 - Assets/Models/Prefabs/Item/InfinityEdge/textures/Runes_metallic.jpeg
 - Assets/Models/Prefabs/Item/InfinityEdge/textures/H_Bevel_AO.jpeg
 - Assets/Models/Prefabs/Item/InfinityEdge/textures/Handle_metallic.jpeg
+- Assets/Models/Prefabs/Item/DeadMansPlate/textures/material_0_baseColor.jpeg
 - Assets/Models/Prefabs/Item/InfinityEdge/textures/Blade_roughness.jpeg
 - Assets/Models/Prefabs/Item/InfinityEdge/textures/G_Part_AO.jpeg
 - Assets/Models/Prefabs/Item/InfinityEdge/Materials/Runes_albedo.mat
 - Assets/Models/Prefabs/Item/InfinityEdge/textures/H_Bevel_roughness.jpeg
 - Assets/Models/Prefabs/Item/InfinityEdge/textures/Blade_normal.png
 - Assets/Models/Prefabs/Item/InfinityEdge/textures/Runes_normal.png
+- Assets/Textures/Icons/Buff/WitsEndBuff.png
 - Assets/Textures/Icons/Item/SpearofShojin.png
+- Assets/Textures/Icons/Buff/DeathsDanceBuff.png
 - Assets/Models/Prefabs/Item/InfinityEdge/textures/H_Bevel_albedo.jpeg
+- Assets/Models/Prefabs/Item/DeadMansPlate/textures/material_0_metallicRoughness.png
 - Assets/Models/Prefabs/Item/InfinityEdge/textures/G_Part_normal.png
 - Assets/Models/Prefabs/Item/InfinityEdge/textures/Wings_roughness.jpeg
+- Assets/Textures/Icons/Item/BotRK_full.png
 - Assets/Textures/Icons/Item/TitanicHydra.png
 - Assets/Models/Prefabs/Item/InfinityEdge/textures/Runes_emissive.jpeg
 - Assets/Models/Prefabs/Item/InfinityEdge/textures/H_Bevel_normal.png
@@ -115,7 +120,9 @@ Assets:
 - Assets/Models/Prefabs/Item/SpearOfShojin/Materials/Glaive_albedo.mat
 - Assets/Textures/Icons/Item/Bloodthirster.png
 - Assets/Models/Prefabs/Item/InfinityEdge/textures/lambert1_AO.jpeg
+- Assets/Models/Prefabs/Item/DeadMansPlate/deadMansMaterial.mat
 - Assets/Textures/Icons/Item/Heartsteel.png
 - Assets/Models/Prefabs/Item/InfinityEdge/textures/Wings_albedo.jpeg
+- Assets/Textures/Icons/Buff/DeadMansBuff.png
 - Assets/Models/Prefabs/Item/InfinityEdge/Materials/G_Part_albedo.mat
 Dependencies: []

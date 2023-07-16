@@ -80,6 +80,36 @@ namespace LeagueItems
                     stackingFormula: BetterUI.ItemStats.HyperbolicStacking,
                     statFormatter: BetterUI.ItemStats.StatFormatter.Percent
                 );
+                BetterUI.ItemStats.RegisterStat(
+                    itemDef: DeathsDance.itemDef,
+                    "Total Damage Taken",
+                    1f,
+                    1f,
+                    statFormatter: DeathsDanceTakenFormatter
+                );
+                BetterUI.ItemStats.RegisterStat(
+                    itemDef: DeathsDance.itemDef,
+                    "Total Damage Cleansed",
+                    1f,
+                    1f,
+                    statFormatter: DeathsDanceCleansedFormatter
+                );
+                // Guinsoo's Rageblade
+                BetterUI.ItemStats.RegisterStat(
+                    itemDef: GuinsoosRageblade.itemDef,
+                    "On-Hit Damage",
+                    1f,
+                    1f,
+                    statFormatter: GuinsoosOnHitFormatter,
+                    itemTag: BetterUI.ItemStats.ItemTag.Damage
+                );
+                BetterUI.ItemStats.RegisterStat(
+                    itemDef: GuinsoosRageblade.itemDef,
+                    "Total Damage Dealt",
+                    1f,
+                    1f,
+                    statFormatter: GuinsoosTotalFormatter
+                );
                 // Heartsteel
                 BetterUI.ItemStats.RegisterStat(
                     itemDef: Heartsteel.itemDef,
@@ -92,7 +122,7 @@ namespace LeagueItems
                 );
                 BetterUI.ItemStats.RegisterStat(
                     itemDef: Heartsteel.itemDef,
-                    "Total Bonus Health",
+                    "Bonus Base Health",
                     1f,
                     1f,
                     statFormatter: HeartsteelTotalFormatter,
@@ -145,7 +175,7 @@ namespace LeagueItems
                 // Titanic Hydra
                 BetterUI.ItemStats.RegisterStat(
                     itemDef: TitanicHydra.itemDef,
-                    "Bonus Base Damage",
+                    "Bonus Damage",
                     1f,
                     1f,
                     statFormatter: TitanicDamageFormatter
@@ -153,11 +183,20 @@ namespace LeagueItems
                 // Warmog's Armor
                 BetterUI.ItemStats.RegisterStat(
                     itemDef: WarmogsArmor.itemDef,
-                    "Bonus Base Health",
+                    "Bonus Health",
                     1f,
                     1f,
                     statFormatter: WarmogsHealthFormatter,
                     itemTag: BetterUI.ItemStats.ItemTag.MaxHealth
+                );
+                // Wit's End
+                BetterUI.ItemStats.RegisterStat(
+                    itemDef: WitsEnd.itemDef,
+                    "Fray Stack Duration",
+                    WitsEnd.frayDurationPerStack,
+                    WitsEnd.frayDurationPerStack,
+                    stackingFormula: BetterUI.ItemStats.LinearStacking,
+                    statFormatter: BetterUI.ItemStats.StatFormatter.Seconds
                 );
             }
 
@@ -222,6 +261,93 @@ namespace LeagueItems
                     if (component)
                     {
                         string temp = String.Format("{0:#}", component.TotalDamageDealt);
+                        temp = temp == "" ? "0" : temp;
+
+                        sb.AppendFormat(temp);
+                    }
+                    else
+                    {
+                        sb.Append("0");
+                    }
+                }
+            };
+
+            public static BetterUI.ItemStats.StatFormatter DeathsDanceTakenFormatter = new()
+            {
+                suffix = "",
+                style = BetterUI.ItemStats.Styles.Damage,
+                statFormatter = (sb, value, master) =>
+                {
+                    if (!master.inventory) return;
+
+                    var component = master.inventory.GetComponent<DeathsDance.DeathsDanceStatistics>();
+
+                    if (component)
+                    {
+                        string tempTaken = String.Format("{0:#}", component.TotalDamageTaken);
+                        tempTaken = tempTaken == "" ? "0" : tempTaken;
+
+                        sb.AppendFormat(tempTaken);
+                    }
+                    else
+                    {
+                        sb.Append("0");
+                    }
+                }
+            };
+
+            public static BetterUI.ItemStats.StatFormatter DeathsDanceCleansedFormatter = new()
+            {
+                suffix = "",
+                style = BetterUI.ItemStats.Styles.Healing,
+                statFormatter = (sb, value, master) =>
+                {
+                    if (!master.inventory) return;
+
+                    var component = master.inventory.GetComponent<DeathsDance.DeathsDanceStatistics>();
+
+                    if (component)
+                    {
+                        string tempCleansed = String.Format("{0:#}", component.TotalDamageTaken);
+                        tempCleansed = tempCleansed == "" ? "0" : tempCleansed;
+
+                        sb.AppendFormat(tempCleansed);
+                    }
+                    else
+                    {
+                        sb.Append("0");
+                    }
+                }
+            };
+
+            public static BetterUI.ItemStats.StatFormatter GuinsoosOnHitFormatter = new()
+            {
+                suffix = "",
+                style = BetterUI.ItemStats.Styles.Damage,
+                statFormatter = (sb, value, master) =>
+                {
+                    if (!master.hasBody) return;
+
+                    float onHitDamage = GuinsoosRageblade.CalculateDamageOnHit(master.GetBody(), value);
+                    string valueDamageText = onHitDamage == 0 ? "0" : String.Format("{0:#.#}", onHitDamage);
+
+                    sb.AppendFormat(valueDamageText);
+                }
+            };
+
+            public static BetterUI.ItemStats.StatFormatter GuinsoosTotalFormatter = new()
+            {
+                suffix = "",
+                style = BetterUI.ItemStats.Styles.Damage,
+                statFormatter = (sb, value, master) =>
+                {
+                    if (!master.inventory) return;
+
+                    var component = master.inventory.GetComponent<GuinsoosRageblade.GuinsoosStatistics>();
+
+                    if (component)
+                    {
+                        string temp = String.Format("{0:#.#}", component.TotalDamageDealt);
                         temp = temp == "" ? "0" : temp;
 
                         sb.AppendFormat(temp);
