@@ -107,7 +107,7 @@ namespace LeagueItems
 
             ItemTierCatalog.availability.CallWhenAvailable(() =>
             {
-                if (itemDef) itemDef.tier = ItemTier.VoidTier2;
+                if (itemDef) itemDef.tier = ItemTier.VoidTier3;
             });
 
             itemDef.pickupIconSprite = LeagueItemsPlugin.MainAssets.LoadAsset<Sprite>("GuinsoosRageblade.png");

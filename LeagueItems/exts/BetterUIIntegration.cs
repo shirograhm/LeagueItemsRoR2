@@ -308,7 +308,7 @@ namespace LeagueItems
 
                     if (component)
                     {
-                        string tempCleansed = String.Format("{0:#}", component.TotalDamageTaken);
+                        string tempCleansed = String.Format("{0:#}", component.TotalDamageCleansed);
                         tempCleansed = tempCleansed == "" ? "0" : tempCleansed;
 
                         sb.AppendFormat(tempCleansed);
