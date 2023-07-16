@@ -109,6 +109,8 @@ namespace LeagueItems
             {
                 if (itemDef) itemDef.tier = ItemTier.VoidTier3;
             });
+            // Requires Void DLC to use item
+            itemDef.requiredExpansion = LeagueItemsPlugin.voidDLC;
 
             itemDef.pickupIconSprite = LeagueItemsPlugin.MainAssets.LoadAsset<Sprite>("GuinsoosRageblade.png");
             itemDef.pickupModelPrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Mystery/PickupMystery.prefab").WaitForCompletion();

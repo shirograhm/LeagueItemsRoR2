@@ -1,8 +1,10 @@
 using BepInEx;
 using R2API;
 using RoR2;
+using RoR2.ExpansionManagement;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.AddressableAssets;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -22,6 +24,8 @@ namespace LeagueItems
         public const string PluginGUID = "com.shirograhm.leagueitems";
         public const string PluginName = "LeagueItems";
         public const string PluginVersion = "0.1.1";
+
+        public static ExpansionDef voidDLC;
 
         public static PluginInfo PInfo { get; private set; }
 
@@ -48,6 +52,8 @@ namespace LeagueItems
                 }
             }
 
+            // Void DLC Items
+            voidDLC = Addressables.LoadAssetAsync<ExpansionDef>("RoR2/DLC1/Common/DLC1.asset").WaitForCompletion();
             On.RoR2.Items.ContagiousItemManager.Init += InjectVoidItems;
 
             GenericGameEvents.Init();
