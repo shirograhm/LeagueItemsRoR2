@@ -94,6 +94,15 @@ namespace LeagueItems
                     1f,
                     statFormatter: DeathsDanceCleansedFormatter
                 );
+                // Duskblade of Draktharr
+                BetterUI.ItemStats.RegisterStat(
+                    itemDef: DuskbladeOfDraktharr.itemDef,
+                    "Armor Reduction",
+                    DuskbladeOfDraktharr.armorIgnoredFirstStackNumber,
+                    DuskbladeOfDraktharr.armorIgnoredExtraStackNumber,
+                    stackingFormula: BetterUI.ItemStats.LinearStacking,
+                    statFormatter: BetterUI.ItemStats.StatFormatter.Armor
+                );
                 // Guinsoo's Rageblade
                 BetterUI.ItemStats.RegisterStat(
                     itemDef: GuinsoosRageblade.itemDef,

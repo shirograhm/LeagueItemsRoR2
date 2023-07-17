@@ -129,8 +129,9 @@ namespace LeagueItems
             LanguageAPI.Add("IEPickup", "Gain crit chance and crit damage.");
 
             // The Description is where you put the actual numbers and give an advanced description.
-            LanguageAPI.Add("IEDesc", "Gain <style=cIsUtility>" + critChanceIncreaseNumber + "%</style> <style=cStack>(+" + critChanceIncreaseNumber + "% per stack)</style> crit chance "
-                                       + "and <style=cIsUtility>" + critDamageIncreaseNumber + "%</style> <style=cStack>(+" + critDamageIncreaseNumber + "% per stack)</style> crit damage.");
+            LanguageAPI.Add("IEDesc",
+                "Gain <style=cIsUtility>" + critChanceIncreaseNumber + "%</style> <style=cStack>(+" + critChanceIncreaseNumber + "% per stack)</style> crit chance " +
+                "and <style=cIsUtility>" + critDamageIncreaseNumber + "%</style> <style=cStack>(+" + critDamageIncreaseNumber + "% per stack)</style> crit damage.");
 
             // The Lore is, well, flavor. You can write pretty much whatever you want here.
             LanguageAPI.Add("IELore", "Infinity edge lore.");

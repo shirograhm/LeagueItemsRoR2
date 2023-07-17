@@ -217,7 +217,9 @@ namespace LeagueItems
             LanguageAPI.Add("BotrkPickup", "Deal a percentage of enemies current health as bonus damage on-hit.");
 
             // The Description is where you put the actual numbers and give an advanced description.
-            LanguageAPI.Add("BotrkDesc", "Deal <style=cIsDamage>" + onHitDamageNumber + "%</style> <style=cStack>(+" + onHitDamageNumber + "% per stack)</style> of enemy current health as bonus damage on-hit. Deals a minimum of 1 damage on-hit.");
+            LanguageAPI.Add("BotrkDesc", 
+                "Deal <style=cIsDamage>" + onHitDamageNumber + "%</style> <style=cStack>(+" + onHitDamageNumber + "% per stack)</style> " +
+                "of enemy current health as bonus damage on-hit. Deals a minimum of 1 damage on-hit.");
 
             // The Lore is, well, flavor. You can write pretty much whatever you want here.
             LanguageAPI.Add("BotrkLore", "A sword belonging to the Shadow Isles.");

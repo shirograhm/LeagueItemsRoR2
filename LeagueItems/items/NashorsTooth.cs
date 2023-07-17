@@ -223,11 +223,12 @@ namespace LeagueItems
             LanguageAPI.Add("NTPickup", "Deal flat damage on-hit.");
 
             // The Description is where you put the actual numbers and give an advanced description.
-            LanguageAPI.Add("NTDesc", "Deal <style=cIsDamage>" + firstStackMultiplier + "</style> (<style=cStack>(+" + extraStacksMultiplier + " per stack) "
-                                       + "+" + levelDamageMultiplier + " per level</style>) damage on-hit.");
+            LanguageAPI.Add("NTDesc", 
+                "Deal <style=cIsDamage>" + firstStackMultiplier + "</style> (<style=cStack>(+" + extraStacksMultiplier + " per stack) " +
+                "+" + levelDamageMultiplier + " per level</style>) damage on-hit.");
 
             // The Lore is, well, flavor. You can write pretty much whatever you want here.
-            LanguageAPI.Add("NTLore", "A sword belonging to the Shadow Isles.");
+            LanguageAPI.Add("NTLore", "A stolen tooth from a great beast.");
         }
     }
 }

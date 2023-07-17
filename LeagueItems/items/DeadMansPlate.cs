@@ -302,9 +302,11 @@ namespace LeagueItems
             LanguageAPI.Add("DMPPickup", "Gain stacking movement speed over time. Expend max stacks to deal bonus damage on-hit.");
 
             // The Description is where you put the actual numbers and give an advanced description.
-            LanguageAPI.Add("DMPDesc", "Gain a stack of Momentum every second, up to a maximum of <style=cIsUtility>" + MAX_MOMENTUM_STACKS + "</style>. " +
+            LanguageAPI.Add("DMPDesc",
+                "Gain a stack of Momentum every second, up to a maximum of <style=cIsUtility>" + MAX_MOMENTUM_STACKS + "</style>. " +
                 "Each stack gives <style=cIsUtility>" + movementSpeedPerStack + "%</style> movement speed. " +
-                "Once fully stacked, expend all stacks to deal <style=cIsDamage>" + bonusDamagePerItemStack + "%</style> <style=cStack>(+" + bonusDamagePerItemStack + "% per stack)</style> bonus on-hit damage.");
+                "Once fully stacked, expend all stacks to deal <style=cIsDamage>" + bonusDamagePerItemStack + "%</style> " +
+                "<style=cStack>(+" + bonusDamagePerItemStack + "% per stack)</style> bonus on-hit damage.");
 
             // The Lore is, well, flavor. You can write pretty much whatever you want here.
             LanguageAPI.Add("DMPLore", "The plate armor of a dead man.");

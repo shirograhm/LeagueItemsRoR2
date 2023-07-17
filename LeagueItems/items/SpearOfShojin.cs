@@ -118,8 +118,9 @@ namespace LeagueItems
             LanguageAPI.Add("SoSPickup", "Gain a percentage of your damage as bonus cooldown reduction.");
 
             // The Description is where you put the actual numbers and give an advanced description.
-            LanguageAPI.Add("SoSDesc", "Gain <style=cIsUtility>" + cdrFromDamageNumber + "%</style> <style=cStack>(+" + cdrFromDamageNumber + "% per stack)</style> "
-                                        + "of your base damage as bonus cooldown reduction, up to a maximum bonus of <style=cIsUtility>" + MAX_BONUS_CDR + "%</style> CDR.");
+            LanguageAPI.Add("SoSDesc",
+                "Gain <style=cIsUtility>" + cdrFromDamageNumber + "%</style> <style=cStack>(+" + cdrFromDamageNumber + "% per stack)</style> " +
+                "of your base damage as bonus cooldown reduction, up to a maximum bonus of <style=cIsUtility>" + MAX_BONUS_CDR + "%</style> CDR.");
 
             // The Lore is, well, flavor. You can write pretty much whatever you want here.
             LanguageAPI.Add("SoSLore", "A jade spear.");

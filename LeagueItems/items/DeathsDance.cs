@@ -217,17 +217,18 @@ namespace LeagueItems
                 {
                     int defianceStackCount = self.GetBuffCount(defianceBuff);
                     // Clamp damageToTake
-                    int damageToTake = (int)Mathf.Clamp(defianceStackCount, 0, CalculateMaximumDamagePerSecond(self.healthComponent.fullHealth)) * 2;
+                    int damageToTake = (int)Mathf.Clamp(defianceStackCount, 0, CalculateMaximumDamagePerSecond(self.healthComponent.fullHealth));
 
                     DamageInfo info = new()
                     {
-                        damage = damageToTake,
+                        damage = damageToTake * 2,
                         attacker = self.gameObject,
+                        inflictor = self.gameObject,
                         procCoefficient = 0f,
                         position = self.corePosition,
                         crit = false,
                         damageColorIndex = deathsDanceDamageColor,
-                        damageType = DamageType.BypassBlock | DamageType.BypassArmor | DamageType.BypassOneShotProtection   // Damage ignores armor stat and flat damage reduction
+                        damageType = DamageType.BypassBlock | DamageType.BypassArmor  // Damage ignores armor stat and flat damage reduction
                     };
                     DamageAPI.AddModdedDamageType(info, deathsDanceDamageType);
 
@@ -290,6 +291,7 @@ namespace LeagueItems
 
                         int oldDefiance = victimInfo.body.GetBuffCount(defianceBuff);
                         int newDefiance = oldDefiance + (int)damageTurnedIntoDefiance;
+
                         // Set stacks equal to total stacks plus stacks gained
 #pragma warning disable Publicizer001 // Accessing a member that was not originally public
                         victimInfo.body.SetBuffCount(defianceBuff.buffIndex, newDefiance);
@@ -316,9 +318,10 @@ namespace LeagueItems
             LanguageAPI.Add("DDPickup", "Convert a portion of damage taken into damage taken over time. Cleanse remaining damage when killing an elite enemy.");
 
             // The Description is where you put the actual numbers and give an advanced description.
-            LanguageAPI.Add("DDDesc", "Convert <style=cIsUtility>" + damageReductionIncreaseNumber + "%</style> <style=cStack>(+" + damageReductionIncreaseNumber + "% per stack)</style> of damage taken into stacks of Defiance (1 damage per stack)."
-                            + " Defiance stacks are consumed as damage over time, but damage from Defiance stacks cannot exceed <style=cIsDamage>" + MAX_DAMAGE_PER_SECOND + "%</style> of your max health per second."
-                            + " When you kill an elite enemy, cleanse all remaining stacks.");
+            LanguageAPI.Add("DDDesc",
+                "Convert <style=cIsUtility>" + damageReductionIncreaseNumber + "%</style> <style=cStack>(+" + damageReductionIncreaseNumber + "% per stack)</style> " +
+                "of damage taken into stacks of Defiance (1 damage per stack). Defiance stacks are consumed as damage over time, but damage from Defiance stacks cannot exceed " +
+                "<style=cIsDamage>" + MAX_DAMAGE_PER_SECOND + "%</style> of your max health per second. When you kill an elite enemy, cleanse all remaining stacks.");
 
             // The Lore is, well, flavor. You can write pretty much whatever you want here.
             LanguageAPI.Add("DDLore", "Death's Dance lore.");

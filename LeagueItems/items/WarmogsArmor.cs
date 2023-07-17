@@ -136,7 +136,9 @@ namespace LeagueItems
             LanguageAPI.Add("WAPickup", "Gain max health.");
 
             // The Description is where you put the actual numbers and give an advanced description.
-            LanguageAPI.Add("WADesc", "Gain <style=cIsHealth>" + firstStackIncreaseNumber + "%</style> <style=cStack>(+" + extraStackIncreaseNumber + "% per stack)</style> of your base health as bonus health.");
+            LanguageAPI.Add("WADesc", 
+                "Gain <style=cIsHealth>" + firstStackIncreaseNumber + "%</style> " +
+                "<style=cStack>(+" + extraStackIncreaseNumber + "% per stack)</style> of your base health as bonus health.");
 
             // The Lore is, well, flavor. You can write pretty much whatever you want here.
             LanguageAPI.Add("WALore", "The living armor protected the greatest troll warrior in the entire realm during the bloodiest and most devastating battles of the Rune Wars. " +

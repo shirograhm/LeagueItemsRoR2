@@ -112,7 +112,7 @@ namespace LeagueItems
             // Requires Void DLC to use item
             itemDef.requiredExpansion = LeagueItemsPlugin.voidDLC;
 
-            itemDef.pickupIconSprite = LeagueItemsPlugin.MainAssets.LoadAsset<Sprite>("GuinsoosRageblade.png");
+            itemDef.pickupIconSprite = LeagueItemsPlugin.MainAssets.LoadAsset<Sprite>("GuinsoosRageblade_Void.png");
             itemDef.pickupModelPrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Mystery/PickupMystery.prefab").WaitForCompletion();
             itemDef.canRemove = true;
             itemDef.hidden = false;
@@ -199,8 +199,9 @@ namespace LeagueItems
             LanguageAPI.Add("GRPickup", "Convert your crit chance into flat damage on-hit.");
 
             // The Description is where you put the actual numbers and give an advanced description.
-            LanguageAPI.Add("GRDesc", "Convert every 1% of your crit chance into <style=cIsDamage>" + firstStackDamagePerCrit + "</style> <style=cStack>(+" + extraStackDamagePerCrit + " per stack) "
-                                       + " damage on-hit.");
+            LanguageAPI.Add("GRDesc", 
+                "Convert every 1% of your crit chance into <style=cIsDamage>" + firstStackDamagePerCrit + "</style> " +
+                "<style=cStack>(+" + extraStackDamagePerCrit + " per stack) damage on-hit.");
 
             // The Lore is, well, flavor. You can write pretty much whatever you want here.
             LanguageAPI.Add("GRLore", "A very angry blade.");

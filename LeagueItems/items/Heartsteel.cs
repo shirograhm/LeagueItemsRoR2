@@ -107,7 +107,7 @@ namespace LeagueItems
                 if (itemDef) itemDef.tier = ItemTier.Tier3;
             });
 
-            itemDef.pickupIconSprite = LeagueItemsPlugin.MainAssets.LoadAsset<Sprite>("Heartsteel.png");
+            itemDef.pickupIconSprite = LeagueItemsPlugin.MainAssets.LoadAsset<Sprite>("Heartsteel_Small.png");
             itemDef.pickupModelPrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Mystery/PickupMystery.prefab").WaitForCompletion();
             itemDef.canRemove = true;
             itemDef.hidden = false;
@@ -217,8 +217,10 @@ namespace LeagueItems
             LanguageAPI.Add("HSPickup", "Gain stacking movement speed over time. Expend max stacks to deal bonus damage on-hit.");
 
             // The Description is where you put the actual numbers and give an advanced description.
-            LanguageAPI.Add("HSDesc", "Upon killing an elite enemy, gain <style=cIsHealth>" + firstStackIncreaseNumber + "%</style> <style=cStack>(+" + extraStackIncreaseNumber + "% per stack)</style> "
-                                       + "of your max health as permanent base health, up to a max of <style=cIsHealth>" + MAX_HEALTH_BONUS_PER_STACK + "</style> <style=cStack>(+" + MAX_HEALTH_BONUS_PER_STACK + " per stack)</style> bonus health.");
+            LanguageAPI.Add("HSDesc",
+                "Upon killing an elite enemy, gain <style=cIsHealth>" + firstStackIncreaseNumber + "%</style> " +
+                "<style=cStack>(+" + extraStackIncreaseNumber + "% per stack)</style> of your max health as permanent base health, up to a max of " +
+                "<style=cIsHealth>" + MAX_HEALTH_BONUS_PER_STACK + "</style> <style=cStack>(+" + MAX_HEALTH_BONUS_PER_STACK + " per stack)</style> bonus health.");
 
             // The Lore is, well, flavor. You can write pretty much whatever you want here.
             LanguageAPI.Add("HSLore", "Heartsteel lore.");

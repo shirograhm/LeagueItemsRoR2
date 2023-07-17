@@ -131,9 +131,10 @@ namespace LeagueItems
             LanguageAPI.Add("WEPickup", "Gain temporary attack speed and movement speed on-hit.");
 
             // The Description is where you put the actual numbers and give an advanced description.
-            LanguageAPI.Add("WEDesc", "Gain a stack of Fray on-hit. " +
-                "Each stack of Fray grants <style=cIsUtility>" + statPerStackNumber + "%</style> <style=cStack>(+" + statPerStackNumber + "% per stack)</style> bonus attack and movement speed " +
-                "and lasts for <style=cIsUtility>" + frayDurationPerStack + "</style> <style=cStack>(+" + frayDurationPerStack + " per stack)</style> seconds.");
+            LanguageAPI.Add("WEDesc", 
+                "Gain a stack of Fray on-hit. Each stack of Fray grants <style=cIsUtility>" + statPerStackNumber + "%</style> " +
+                "<style=cStack>(+" + statPerStackNumber + "% per stack)</style> bonus attack and movement speed, and lasts for " +
+                "<style=cIsUtility>" + frayDurationPerStack + "</style> <style=cStack>(+" + frayDurationPerStack + " per stack)</style> seconds.");
 
             // The Lore is, well, flavor. You can write pretty much whatever you want here.
             LanguageAPI.Add("WELore", "You are at your wit's end.");

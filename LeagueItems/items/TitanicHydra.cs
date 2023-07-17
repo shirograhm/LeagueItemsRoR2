@@ -115,7 +115,9 @@ namespace LeagueItems
             LanguageAPI.Add("THPickup", "Increase damage by a percentage of your max health.");
 
             // The Description is where you put the actual numbers and give an advanced description.
-            LanguageAPI.Add("THDesc", "Increase damage by <style=cIsHealth>" + firstStackBonusNumber + "%</style> <style=cStack>(+" + extraStackBonusNumber + "% per stack)</style> of max health.");
+            LanguageAPI.Add("THDesc",
+                "Increase damage by <style=cIsHealth>" + firstStackBonusNumber + "%</style> " +
+                "<style=cStack>(+" + extraStackBonusNumber + "% per stack)</style> of max health.");
 
             // The Lore is, well, flavor. You can write pretty much whatever you want here.
             LanguageAPI.Add("THLore", "A large weapon.");
