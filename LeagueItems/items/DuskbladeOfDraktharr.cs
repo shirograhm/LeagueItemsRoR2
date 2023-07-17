@@ -11,9 +11,9 @@ namespace LeagueItems
     {
         public static ItemDef itemDef;
 
-        // All damage dealt ignores 50 (+25 per stack) flat armor.
-        public static float armorIgnoredFirstStackNumber = 50f;
-        public static float armorIgnoredExtraStackNumber = 25f;
+        // All damage dealt ignores 60 (+40 per stack) flat armor.
+        public static float armorIgnoredFirstStackNumber = 60f;
+        public static float armorIgnoredExtraStackNumber = 40f;
 
 
         internal static void Init()

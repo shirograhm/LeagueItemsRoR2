@@ -11,10 +11,10 @@ namespace LeagueItems
     {
         public static ItemDef itemDef;
 
-        // Gain 50% (+50% per stack) of your base damage as bonus cooldown reduction, up to a maximum bonus of 50% CDR.
+        // Gain 40% (+40% per stack) of your base damage as bonus cooldown reduction, up to a maximum bonus of 40% CDR.
         public const float MAX_BONUS_CDR = 40.0f;
 
-        public static float cdrFromDamageNumber = 25.0f;
+        public static float cdrFromDamageNumber = 40.0f;
         public static float cdrFromDamagePercent = cdrFromDamageNumber / 100f;
 
         internal static void Init()
