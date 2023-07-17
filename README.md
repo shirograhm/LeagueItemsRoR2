@@ -2,7 +2,6 @@
 Adds League of Legends inspired items for Risk of Rain 2.
 
 ## Added Items
-![alt_text]([files:](https://github.com/xavierwg13/LeagueItemsRoR2/blob/master/Assets/BotRK.png) "Blade of the Ruined King")
 ### Blade of the Ruined King
 Deals 1.5% (+1.5% per item) current health damage on-hit. Capped at at least 1 per hit.
 ### Bloodthirster
