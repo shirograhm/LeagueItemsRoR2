@@ -3,12 +3,12 @@ Adds League of Legends inspired items for Risk of Rain 2.
 
 ## Added Items
 ### Blade of the Ruined King
-Deals 1.5% (+1.5% per item) current health damage on-hit. Capped at at least 1 per hit.
+Deals 1% (+1% per item) current health damage on-hit. Does a minimum of 1 damage on-hit.
 ### Bloodthirster
 Heal for 20% (+20% per item) of damage dealt.
 ### Dead Man's Plate
 Gain a stack of Momentum every second, up to 10 stacks. Each stack gives 3% movement speed.
-Once fully stacked, expend all stacks to deal 300% (+300% per item) bonus on-hit damage.
+Once fully stacked, expend all stacks to deal 500% (+500% per item) bonus on-hit damage.
 ### Death's Dance
 Convert 25% (+25% per item) of damage taken into stacks of Defiance (each stack = 1 damage).
 Defiance stacks are consumed as damage over time, but damage from Defiance cannot exceed 2% of your max health per second.
