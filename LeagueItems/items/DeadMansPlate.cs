@@ -18,13 +18,13 @@ namespace LeagueItems
         public static Color32 deadmansColor = new Color32(230, 92, 0, 255);
 
         // Gain a stack of Momentum every second, up to 10 stacks. Each stack gives 3% movement speed.
-        // Once fully stacked, expend all stacks to deal 300% (+300% per item stack) bonus on-hit damage.
+        // Once fully stacked, expend all stacks to deal 500% (+500% per item stack) bonus on-hit damage.
         public const int MAX_MOMENTUM_STACKS = 10;
 
         public static float movementSpeedPerStack = 3.0f;
         public static float movementSpeedPerStackPercent = movementSpeedPerStack / 100f;
 
-        public static float bonusDamagePerItemStack = 300.0f;
+        public static float bonusDamagePerItemStack = 500.0f;
         public static float bonusDamagePerItemStackPercent = bonusDamagePerItemStack / 100f;
 
         public static float timeOfLastStack = 0f;
