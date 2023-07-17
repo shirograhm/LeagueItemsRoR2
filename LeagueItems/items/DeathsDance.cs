@@ -23,7 +23,7 @@ namespace LeagueItems
         public const float MAX_DAMAGE_PER_SECOND = 2f;
         public const float MAX_DAMAGE_PER_SECOND_PERCENT = MAX_DAMAGE_PER_SECOND / 100f;
 
-        public static float damageReductionIncreaseNumber = 30f;
+        public static float damageReductionIncreaseNumber = 25f;
         public static float damageReductionIncreasePercent = damageReductionIncreaseNumber / 100f;
 
         public static float timeOfLastDefianceProc = 0f;
