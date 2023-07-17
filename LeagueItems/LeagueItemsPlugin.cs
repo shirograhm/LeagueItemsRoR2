@@ -56,7 +56,7 @@ namespace LeagueItems
 
             // Void DLC Items
             voidDLC = Addressables.LoadAssetAsync<ExpansionDef>("RoR2/DLC1/Common/DLC1.asset").WaitForCompletion();
-            On.RoR2.Items.ContagiousItemManager.Init += InjectVoidItems;
+            RoR2.ItemCatalog.availability.CallWhenAvailable(InjectVoidItems);
 
             GenericGameEvents.Init();
             DamageColorAPI.Init();
@@ -80,47 +80,32 @@ namespace LeagueItems
             logger.LogMessage(nameof(Awake) + " done.");
         }
 
-        private void InjectVoidItems(On.RoR2.Items.ContagiousItemManager.orig_Init orig)
+        private void InjectVoidItems()
         {
-            List<ItemDef.Pair> newVoidPairs = new List<ItemDef.Pair>();
-
-            Debug.Log("Injecting LeagueMod item corruption...");
-            // Nashor's => Guinsoo's
-            newVoidPairs.Add(new ItemDef.Pair()
+            On.RoR2.Items.ContagiousItemManager.Init += (orig) =>
             {
-                itemDef1 = NashorsTooth.itemDef,
-                itemDef2 = GuinsoosRageblade.itemDef
-            });
+                List<ItemDef.Pair> newVoidPairs = new List<ItemDef.Pair>();
 
-            var key = DLC1Content.ItemRelationshipTypes.ContagiousItem;
-            Debug.Log(key);
+                Debug.Log("Injecting LeagueMod item corruption...");
+                // Nashor's => Guinsoo's
+                newVoidPairs.Add(new ItemDef.Pair()
+                {
+                    itemDef1 = NashorsTooth.itemDef,
+                    itemDef2 = GuinsoosRageblade.itemDef
+                });
+
+                var key = DLC1Content.ItemRelationshipTypes.ContagiousItem;
+                Debug.Log(key);
 #pragma warning disable Publicizer001 // Accessing a member that was not originally public
-            var voidPairs = ItemCatalog.itemRelationships[DLC1Content.ItemRelationshipTypes.ContagiousItem];
-            ItemCatalog.itemRelationships[DLC1Content.ItemRelationshipTypes.ContagiousItem] = voidPairs.Union(newVoidPairs).ToArray();
+                var voidPairs = ItemCatalog.itemRelationships[DLC1Content.ItemRelationshipTypes.ContagiousItem];
+                ItemCatalog.itemRelationships[DLC1Content.ItemRelationshipTypes.ContagiousItem] = voidPairs.Union(newVoidPairs).ToArray();
 #pragma warning restore Publicizer001 // Accessing a member that was not originally public
 
-            Debug.Log("Finished injecting LeagueMod item transformations.");
+                Debug.Log("Finished injecting LeagueMod item transformations.");
 
-            orig();
+                orig();
+            };
         }
-
-        // All Items Array
-        ItemIndex[] allItems = new ItemIndex[]
-        {
-                    BladeOfTheRuinedKing.itemDef.itemIndex,
-                    Bloodthirster.itemDef.itemIndex,
-                    DeadMansPlate.itemDef.itemIndex,
-                    DeathsDance.itemDef.itemIndex,
-                    DuskbladeOfDraktharr.itemDef.itemIndex,
-                    GuinsoosRageblade.itemDef.itemIndex,
-                    Heartsteel.itemDef.itemIndex,
-                    InfinityEdge.itemDef.itemIndex,
-                    NashorsTooth.itemDef.itemIndex,
-                    SpearOfShojin.itemDef.itemIndex,
-                    TitanicHydra.itemDef.itemIndex,
-                    WarmogsArmor.itemDef.itemIndex,
-                    WitsEnd.itemDef.itemIndex
-        };
 
         // The Update() method is run on every frame of the game.
         private void Update()
@@ -139,6 +124,24 @@ namespace LeagueItems
 
                     // And then drop our defined item in front of the player.
                     logger.LogMessage($"Player pressed F2. Spawning a random League item at coordinates {transform.position}.");
+
+                    // All Items Array
+                    ItemIndex[] allItems = new ItemIndex[]
+                    {
+                    BladeOfTheRuinedKing.itemDef.itemIndex,
+                    Bloodthirster.itemDef.itemIndex,
+                    DeadMansPlate.itemDef.itemIndex,
+                    DeathsDance.itemDef.itemIndex,
+                    DuskbladeOfDraktharr.itemDef.itemIndex,
+                    GuinsoosRageblade.itemDef.itemIndex,
+                    Heartsteel.itemDef.itemIndex,
+                    InfinityEdge.itemDef.itemIndex,
+                    NashorsTooth.itemDef.itemIndex,
+                    SpearOfShojin.itemDef.itemIndex,
+                    TitanicHydra.itemDef.itemIndex,
+                    WarmogsArmor.itemDef.itemIndex,
+                    WitsEnd.itemDef.itemIndex
+                    };
 
                     var random = new System.Random();
                     int arrayIdx = random.Next(0, allItems.Length);
