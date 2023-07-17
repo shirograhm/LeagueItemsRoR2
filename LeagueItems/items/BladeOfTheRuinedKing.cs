@@ -16,8 +16,8 @@ namespace LeagueItems
 
         public static Color32 botrkColor = new Color32(40, 179, 191, 255);
 
-        // Deals 1.5% (+1.5% per stack) current health damage on-hit. Capped at at least 1 per hit.
-        public static float onHitDamageNumber = 1.5f;
+        // Deals 1% (+1% per stack) current health damage on-hit. Does a minimum of 1 damage on-hit.
+        public static float onHitDamageNumber = 1f;
         public static float onHitDamagePercent = onHitDamageNumber / 100f;
 
         private static DamageAPI.ModdedDamageType botrkDamageType;
@@ -146,8 +146,8 @@ namespace LeagueItems
                     if (itemCount > 0 && damageInfo.procCoefficient > 0)
                     {
                         float tempDamage = victimBody.healthComponent.health * damageInfo.procCoefficient * hyperbolicPercentage;
-                        // Damage is capped at minimum of 1.0f
-                        float botrkDamage = tempDamage > 1f ? tempDamage : 1f;
+                        // Damage cannot be less than 1.0f
+                        float botrkDamage = Mathf.Clamp(tempDamage, 1.0f, tempDamage);
 
                         DamageInfo botrkProc = new()
                         {
