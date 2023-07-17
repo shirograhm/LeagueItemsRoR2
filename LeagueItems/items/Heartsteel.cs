@@ -152,8 +152,6 @@ namespace LeagueItems
                         float healthToGain = (damageReport.attackerBody.healthComponent.fullHealth) * CalculateHealthIncreasePercent(itemCount);
 
                         itemStats.TotalBonusHealth += healthToGain;
-                        // Cap max heartsteel health increase based on stacks
-                        itemStats.TotalBonusHealth = Mathf.Clamp(itemStats.TotalBonusHealth, 0, CalculateMaxStackableHealth(itemCount));
                     }
                 }
             };
@@ -167,6 +165,9 @@ namespace LeagueItems
 
                     if (itemCount > 0 && itemStats)
                     {
+                        // Cap max heartsteel health increase based on stacks
+                        itemStats.TotalBonusHealth = Mathf.Clamp(itemStats.TotalBonusHealth, 0, CalculateMaxStackableHealth(itemCount));
+
                         args.baseHealthAdd += itemStats.TotalBonusHealth;
                     }
                 }
