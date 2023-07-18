@@ -25,6 +25,8 @@ namespace LeagueItems
         public const string PluginName = "LeagueItems";
         public const string PluginVersion = "0.9.4";
 
+        public const int DEBUG = 1;
+
         public static bool givenStarterPack = false;
 
         public static ExpansionDef voidDLC;
@@ -110,6 +112,7 @@ namespace LeagueItems
         // The Update() method is run on every frame of the game.
         private void Update()
         {
+#if DEBUG
             if (!NetworkServer.active) { return; }
 
             // This if statement checks if the player has currently pressed F2.
@@ -155,6 +158,7 @@ namespace LeagueItems
             {
                 givenStarterPack = false;
             }
+#endif
         }
 
         public struct GenericCharacterInfo
