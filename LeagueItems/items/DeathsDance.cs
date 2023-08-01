@@ -15,15 +15,33 @@ namespace LeagueItems
         public static ItemDef itemDef;
         public static BuffDef defianceBuff;
 
-        public static Color32 deathsDanceColor = new Color32(153, 22, 11, 255);
+        public static Color32 deathsDanceColor = new(153, 22, 11, 255);
 
-        // Convert 25% (+25% per stack) of damage taken into stacks of Defiance (each stack = 1 damage).
+        // Convert 28% (+28% per stack) of damage taken into stacks of Defiance (each stack = 1 damage).
         // Defiance stacks are consumed as damage over time, but damage from Defiance cannot exceed 2% of your max health per second.
         // Cleanse all remaining stacks when killing an elite enemy.
-        public const float MAX_DAMAGE_PER_SECOND = 2f;
-        public const float MAX_DAMAGE_PER_SECOND_PERCENT = MAX_DAMAGE_PER_SECOND / 100f;
+        public static ConfigurableValue<float> maxDamagePerSecond = new(
+            "Item: Deaths Dance",
+            "Damage Over Time",
+            2.0f,
+            "Maximum percent health damage that can be taken from Defiance stacks each second.",
+            new System.Collections.Generic.List<string>()
+            {
+                "ITEM_DEATHSDANCE_DESC"
+            }
+        );
+        public static float maxDamagePerSecondPercent = maxDamagePerSecond / 100f;
 
-        public static float damageReductionIncreaseNumber = 25f;
+        public static ConfigurableValue<float> damageReductionIncreaseNumber = new(
+            "Item: Deaths Dance",
+            "Damage Reduction",
+            28f,
+            "Damage reduction for each stack of Death's Dance.",
+            new System.Collections.Generic.List<string>()
+            {
+                "ITEM_DEATHSDANCE_DESC"
+            }
+        );
         public static float damageReductionIncreasePercent = damageReductionIncreaseNumber / 100f;
 
         public static float timeOfLastDefianceProc = 0f;
@@ -194,7 +212,7 @@ namespace LeagueItems
 
         public static float CalculateMaximumDamagePerSecond(float healthAmount)
         {
-            return healthAmount * MAX_DAMAGE_PER_SECOND_PERCENT;
+            return healthAmount * maxDamagePerSecondPercent;
         }
 
         private static void Hooks()
@@ -321,7 +339,7 @@ namespace LeagueItems
             LanguageAPI.Add("DDDesc",
                 "Convert <style=cIsUtility>" + damageReductionIncreaseNumber + "%</style> <style=cStack>(+" + damageReductionIncreaseNumber + "% per stack)</style> " +
                 "of damage taken into stacks of Defiance (1 damage per stack). Defiance stacks are consumed as damage over time, but damage from Defiance stacks cannot exceed " +
-                "<style=cIsDamage>" + MAX_DAMAGE_PER_SECOND + "%</style> of your max health per second. When you kill an elite enemy, cleanse all remaining stacks.");
+                "<style=cIsDamage>" + maxDamagePerSecond + "%</style> of your max health per second. When you kill an elite enemy, cleanse all remaining stacks.");
 
             // The Lore is, well, flavor. You can write pretty much whatever you want here.
             LanguageAPI.Add("DDLore", "Death's Dance lore.");

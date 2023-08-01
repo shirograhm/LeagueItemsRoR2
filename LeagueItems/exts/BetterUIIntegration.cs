@@ -126,16 +126,14 @@ namespace LeagueItems
                     Heartsteel.firstStackIncreasePercent,
                     Heartsteel.extraStackIncreasePercent,
                     stackingFormula: BetterUI.ItemStats.LinearStacking,
-                    statFormatter: BetterUI.ItemStats.StatFormatter.Percent,
-                    itemTag: BetterUI.ItemStats.ItemTag.MaxHealth
+                    statFormatter: BetterUI.ItemStats.StatFormatter.Percent
                 );
                 BetterUI.ItemStats.RegisterStat(
                     itemDef: Heartsteel.itemDef,
                     "Bonus Base Health",
                     1f,
                     1f,
-                    statFormatter: HeartsteelTotalFormatter,
-                    itemTag: BetterUI.ItemStats.ItemTag.MaxHealth
+                    statFormatter: HeartsteelTotalFormatter
                 );
                 // InfinityEdge
                 BetterUI.ItemStats.RegisterStat(

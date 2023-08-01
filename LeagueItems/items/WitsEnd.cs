@@ -17,9 +17,27 @@ namespace LeagueItems
 
         // Gain a stack of Fray on-hit.
         // Each stack of Fray grants 2% (+2% per stack) bonus attack and movement speed and lasts for 2 (+2 per stack) seconds.
-        public static float frayDurationPerStack = 2f;
+        public static ConfigurableValue<float> frayDurationPerStack = new(
+            "Item: Wits End",
+            "Fray Stack Duration",
+            2f,
+            "Duration of each Fray stack.",
+            new System.Collections.Generic.List<string>()
+            {
+                "ITEM_WITSEND_DESC"
+            }
+        );
 
-        public static float statPerStackNumber = 2f;
+        public static ConfigurableValue<float> statPerStackNumber = new(
+            "Item: Wits End",
+            "Attack & Movement Speed Bonus",
+            2f,
+            "Bonus attack and movement speed gained for each stack of Fray.",
+            new System.Collections.Generic.List<string>()
+            {
+                "ITEM_WITSEND_DESC"
+            }
+        );
         public static float statPerStackPercent = statPerStackNumber / 100f;
         
         internal static void Init()

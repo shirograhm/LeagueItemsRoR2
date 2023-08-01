@@ -14,11 +14,29 @@ namespace LeagueItems
     {
         public static ItemDef itemDef;
 
-        public static Color32 guinsoosColor = new Color32(224, 163, 20, 255);
+        public static Color32 guinsoosColor = new(224, 163, 20, 255);
 
         // Convert every 1% of crit chance to 0.75 + (0.75 per stack) damage on-hit.
-        public const float firstStackDamagePerCrit = .75f;
-        public const float extraStackDamagePerCrit = .75f;
+        public static ConfigurableValue<float> firstStackDamagePerCrit = new(
+            "Item: Guinsoos Rageblade",
+            "On-Hit Damage (First Stack)",
+            0.75f,
+            "On-hit damage for every 1% of crit chance.",
+            new System.Collections.Generic.List<string>()
+            {
+                "ITEM_GUINSOOSRAGEBLADE_DESC"
+            }
+        );
+        public static ConfigurableValue<float> extraStackDamagePerCrit = new(
+            "Item: Guinsoos Rageblade",
+            "On-Hit Damage (Extra Stack)",
+            0.75f,
+            "Additional damage on-hit for every 1% of crit chance for every additional stack of Guinsoo's Rageblade.",
+            new System.Collections.Generic.List<string>()
+            {
+                "ITEM_GUINSOOSRAGEBLADE_DESC"
+            }
+        );
 
         public static DamageAPI.ModdedDamageType guinsoosDamageType;
         public static DamageColorIndex guinsoosDamageColor = DamageColorAPI.RegisterDamageColor(guinsoosColor);

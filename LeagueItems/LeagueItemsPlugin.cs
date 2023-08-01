@@ -23,11 +23,9 @@ namespace LeagueItems
     {
         public const string PluginGUID = "com.shirograhm.leagueitems";
         public const string PluginName = "LeagueItems";
-        public const string PluginVersion = "0.9.4";
+        public const string PluginVersion = "0.9.5";
 
-        public const int DEBUG = 1;
-
-        public static bool givenStarterPack = false;
+        public const int DEBUG = 0;
 
         public static ExpansionDef voidDLC;
 
@@ -61,6 +59,7 @@ namespace LeagueItems
             RoR2.ItemCatalog.availability.CallWhenAvailable(InjectVoidItems);
 
             GenericGameEvents.Init();
+            ConfigOptions.Init();
             DamageColorAPI.Init();
 
             RoR2.ItemCatalog.availability.CallWhenAvailable(Integrations.Init);
@@ -151,12 +150,6 @@ namespace LeagueItems
 
                     PickupDropletController.CreatePickupDroplet(PickupCatalog.FindPickupIndex(allItems[arrayIdx]), transform.position, transform.forward * 20f);
                 }
-                givenStarterPack = true;
-            }
-
-            if (Input.GetKeyDown(KeyCode.F3))
-            {
-                givenStarterPack = false;
             }
 #endif
         }

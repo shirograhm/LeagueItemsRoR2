@@ -15,16 +15,34 @@ namespace LeagueItems
         public static ItemDef itemDef;
         public static BuffDef momentumBuff;
 
-        public static Color32 deadmansColor = new Color32(230, 92, 0, 255);
+        public static Color32 deadmansColor = new(230, 92, 0, 255);
 
         // Gain a stack of Momentum every second, up to 10 stacks. Each stack gives 3% movement speed.
         // Once fully stacked, expend all stacks to deal 500% (+500% per item stack) bonus on-hit damage.
         public const int MAX_MOMENTUM_STACKS = 10;
 
-        public static float movementSpeedPerStack = 3.0f;
+        public static ConfigurableValue<float> movementSpeedPerStack = new(
+            "Item: Dead Mans Plate",
+            "Movespeed Gain",
+            3.0f,
+            "Percent of movement speed gained for each stack of Momentum.",
+            new System.Collections.Generic.List<string>()
+            {
+                "ITEM_DEADMANSPLATE_DESC"
+            }
+        );
         public static float movementSpeedPerStackPercent = movementSpeedPerStack / 100f;
 
-        public static float bonusDamagePerItemStack = 500.0f;
+        public static ConfigurableValue<float> bonusDamagePerItemStack = new(
+            "Item: Dead Mans Plate",
+            "Damage Proc",
+            500.0f,
+            "Proc damage dealt at full Momentum for each stack of Dead Man's Plate.",
+            new System.Collections.Generic.List<string>()
+            {
+                "ITEM_DEADMANSPLATE_DESC"
+            }
+        );
         public static float bonusDamagePerItemStackPercent = bonusDamagePerItemStack / 100f;
 
         public static float timeOfLastStack = 0f;

@@ -8,11 +8,6 @@ namespace LeagueItems
 {
     class GenericGameEvents
     {
-        public struct OnTakeDamageEventInfo
-        {
-            public float damageTaken;
-        }
-
         public delegate void DamageAttackerVictimEventHandler(DamageInfo damageInfo, GenericCharacterInfo attackerInfo, GenericCharacterInfo victimInfo);
         public delegate void DamageReportEventHandler(DamageReport damageReport);
 

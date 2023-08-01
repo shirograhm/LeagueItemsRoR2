@@ -8,17 +8,40 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.Networking;
 
+using static LeagueItems.ConfigManager;
+
 namespace LeagueItems
 {
     internal class BladeOfTheRuinedKing
     {
         public static ItemDef itemDef;
 
-        public static Color32 botrkColor = new Color32(40, 179, 191, 255);
+        public static Color32 botrkColor = new(40, 179, 191, 255);
 
-        // Deals 1% (+1% per stack) current health damage on-hit. Does a minimum of 1 damage on-hit.
-        public static float onHitDamageNumber = 1f;
+        // Deals 1% (+1% per stack) current health damage on-hit, up to 100% of the initial damage.
+        public static ConfigurableValue<float> onHitDamageNumber = new(
+            "Item: Blade of the Ruined King",
+            "On-Hit Damage",
+            1.0f,
+            "Percent of current health done on-hit for each stack of BotRK.",
+            new System.Collections.Generic.List<string>()
+            {
+                "ITEM_BLADEOFTHERUINEDKING_DESC"
+            }
+        );
         public static float onHitDamagePercent = onHitDamageNumber / 100f;
+
+        public static ConfigurableValue<float> maximumDamageCap = new(
+            "Item: Blade of the Ruined King",
+            "Max Damage Cap",
+            100f,
+            "Maximum damage per proc as a percentage of the initial damage (e.g. if your attack does 12 damage, BotRK does a max of 12 damage).",
+            new System.Collections.Generic.List<string>()
+            {
+                "ITEM_BLADEOFTHERUINEDKING_DESC"
+            }
+        );
+        public static float maximumDamageCapPercent = maximumDamageCap / 100f;
 
         private static DamageAPI.ModdedDamageType botrkDamageType;
         public static DamageColorIndex botrkDamageColor = DamageColorAPI.RegisterDamageColor(botrkColor);
@@ -146,8 +169,8 @@ namespace LeagueItems
                     if (itemCount > 0 && damageInfo.procCoefficient > 0)
                     {
                         float tempDamage = victimBody.healthComponent.health * damageInfo.procCoefficient * hyperbolicPercentage;
-                        // Damage cannot be less than 1.0f
-                        float botrkDamage = Mathf.Clamp(tempDamage, 1.0f, tempDamage);
+                        // Damage cannot exceed maxDamageCap% of the initial hit damage
+                        float botrkDamage = Mathf.Clamp(tempDamage, 0.0f, maximumDamageCapPercent * damageInfo.damage);
 
                         DamageInfo botrkProc = new()
                         {
@@ -219,7 +242,7 @@ namespace LeagueItems
             // The Description is where you put the actual numbers and give an advanced description.
             LanguageAPI.Add("BotrkDesc", 
                 "Deal <style=cIsDamage>" + onHitDamageNumber + "%</style> <style=cStack>(+" + onHitDamageNumber + "% per stack)</style> " +
-                "of enemy current health as bonus damage on-hit. Deals a minimum of 1 damage on-hit.");
+                "of enemy current health as bonus damage on-hit, up to a maximum of <style=cIsDamage>" + maximumDamageCap + "%</style> of the initial damage.");
 
             // The Lore is, well, flavor. You can write pretty much whatever you want here.
             LanguageAPI.Add("BotrkLore", "A sword belonging to the Shadow Isles.");

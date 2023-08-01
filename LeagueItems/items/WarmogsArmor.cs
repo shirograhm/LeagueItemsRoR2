@@ -15,9 +15,28 @@ namespace LeagueItems
         public static ItemDef itemDef;
 
         // Gain 50% (+25% per stack) of your base health as bonus health.
-        public static float firstStackIncreaseNumber = 50f;
+        public static ConfigurableValue<float> firstStackIncreaseNumber = new(
+            "Item: Warmogs Armor",
+            "Max Health Gained (First Stack)",
+            50f,
+            "Percentage of maximum health gained as bonus health for the first stack of Warmog's Armor.",
+            new System.Collections.Generic.List<string>()
+            {
+                "ITEM_WARMOGS_DESC"
+            }
+        );
         public static float firstStackIncreasePercent = firstStackIncreaseNumber / 100f;
-        public static float extraStackIncreaseNumber = 25f;
+
+        public static ConfigurableValue<float> extraStackIncreaseNumber = new(
+            "Item: Warmogs Armor",
+            "Max Health Gained (Extra Stack)",
+            25f,
+            "Percentage of maximum health gained as bonus health for each additional stack of Warmog's Armor.",
+            new System.Collections.Generic.List<string>()
+            {
+                "ITEM_WARMOGS_DESC"
+            }
+        ); 
         public static float extraStackIncreasePercent = extraStackIncreaseNumber / 100f;
 
         internal static void Init()

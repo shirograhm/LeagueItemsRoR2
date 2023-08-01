@@ -14,12 +14,41 @@ namespace LeagueItems
     {
         public static ItemDef itemDef;
 
-        public static Color32 nashorsColor = new Color32(191, 10, 137, 255);
+        public static Color32 nashorsColor = new(191, 10, 137, 255);
 
         // Deals 15 ((+5 per stack) +1 per level) damage on-hit.
-        public static float firstStackMultiplier = 15f;
-        public static float extraStacksMultiplier = 5f;
-        public static float levelDamageMultiplier = 1f;
+        public static ConfigurableValue<float> firstStackMultiplier = new(
+            "Item: Nashors Tooth",
+            "On-Hit Damage (First Stack)",
+            15f,
+            "On-hit damage for the first stack of Nashor's Tooth.",
+            new System.Collections.Generic.List<string>()
+            {
+                "ITEM_NASHORSTOOTH_DESC"
+            }
+        );
+
+        public static ConfigurableValue<float> extraStacksMultiplier = new(
+            "Item: Nashors Tooth",
+            "On-Hit Damage (Extra Stack)",
+            5f,
+            "On-hit damage for each additional stack of Nashor's Tooth.",
+            new System.Collections.Generic.List<string>()
+            {
+                "ITEM_NASHORSTOOTH_DESC"
+            }
+        );
+
+        public static ConfigurableValue<float> levelDamageMultiplier = new(
+            "Item: Nashors Tooth",
+            "On-Hit Damage (Per Level)",
+            1f,
+            "On-hit damage gained for each player level.",
+            new System.Collections.Generic.List<string>()
+            {
+                "ITEM_NASHORSTOOTH_DESC"
+            }
+        );
 
         public static DamageAPI.ModdedDamageType nashorsDamageType;
         public static DamageColorIndex nashorsDamageColor = DamageColorAPI.RegisterDamageColor(nashorsColor);

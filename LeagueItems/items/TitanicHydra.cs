@@ -12,9 +12,28 @@ namespace LeagueItems
         public static ItemDef itemDef;
 
         // Increase damage by 2.5% (+1% per stack) of max health.
-        public static float firstStackBonusNumber = 2.5f;
+        public static ConfigurableValue<float> firstStackBonusNumber = new(
+            "Item: Titanic Hydra",
+            "Max Health Coverted (First Stack)",
+            2.5f,
+            "Percentage of maximum health gained as bonus damage for the first stack of Titanic Hydra.",
+            new System.Collections.Generic.List<string>()
+            {
+                "ITEM_SPEAROFSHOJIN_DESC"
+            }
+        );
         public static float firstStackBonusPercent = firstStackBonusNumber / 100f;
-        public static float extraStackBonusNumber = 1f;
+
+        public static ConfigurableValue<float> extraStackBonusNumber = new(
+            "Item: Titanic Hydra",
+            "Max Health Coverted (Extra Stack)",
+            1f,
+            "Percentage of maximum health gained as bonus damage for each additional stack of Titanic Hydra.",
+            new System.Collections.Generic.List<string>()
+            {
+                "ITEM_SPEAROFSHOJIN_DESC"
+            }
+        );
         public static float extraStackBonusPercent = extraStackBonusNumber / 100f;
 
         internal static void Init()

@@ -12,9 +12,26 @@ namespace LeagueItems
         public static ItemDef itemDef;
 
         // All damage dealt ignores 60 (+40 per stack) flat armor.
-        public static float armorIgnoredFirstStackNumber = 60f;
-        public static float armorIgnoredExtraStackNumber = 40f;
-
+        public static ConfigurableValue<float> armorIgnoredFirstStackNumber = new(
+            "Item: Duskblade of Draktharr",
+            "Armor Penetration (First Stack)",
+            60f,
+            "Armor penetration for the first stack of Duskblade.",
+            new System.Collections.Generic.List<string>()
+            {
+                "ITEM_DUSKBLADE_DESC"
+            }
+        );
+        public static ConfigurableValue<float> armorIgnoredExtraStackNumber = new(
+            "Item: Duskblade of Draktharr",
+            "Armor Penetration (Extra Stack)",
+            40f,
+            "Armor penetration for each additional stack of Duskblade.",
+            new System.Collections.Generic.List<string>()
+            {
+                "ITEM_DUSKBLADE_DESC"
+            }
+        );
 
         internal static void Init()
         {

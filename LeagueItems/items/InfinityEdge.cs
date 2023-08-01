@@ -15,9 +15,28 @@ namespace LeagueItems
         public static ItemDef itemDef;
 
         // Gain 30% (+30% per stack) crit chance and 60% (+60% per stack) crit damage.
-        public static float critChanceIncreaseNumber = 30f;
+        public static ConfigurableValue<float> critChanceIncreaseNumber = new(
+            "Item: Infinity Edge",
+            "Crit Chance",
+            30f,
+            "Crit chance gained for each stack of Infinity Edge.",
+            new System.Collections.Generic.List<string>()
+            {
+                "ITEM_INFINITYEDGE_DESC"
+            }
+        );
         public static float critChanceIncreasePercent = critChanceIncreaseNumber / 100f;
-        public static float critDamageIncreaseNumber = 60f;
+
+        public static ConfigurableValue<float> critDamageIncreaseNumber = new(
+            "Item: Infinity Edge",
+            "Crit Damage",
+            60f,
+            "Crit damage gained for each stack of Infinity Edge.",
+            new System.Collections.Generic.List<string>()
+            {
+                "ITEM_HEARTSTEEL_DESC"
+            }
+        );
         public static float critDamageIncreasePercent = critDamageIncreaseNumber / 100f;
 
         internal static void Init()

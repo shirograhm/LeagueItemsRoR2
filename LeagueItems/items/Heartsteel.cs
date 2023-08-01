@@ -15,11 +15,39 @@ namespace LeagueItems
         public static ItemDef itemDef;
 
         // Upon killing an elite enemy, gain 3% (+1.5% per stack) of your max health as permanent base health, up to a max of 600 (+600 per stack) bonus base health.
-        public const float MAX_HEALTH_BONUS_PER_STACK = 600f;
-        
-        public static float firstStackIncreaseNumber = 3f;
+        public static ConfigurableValue<float> maxHealthBonusPerStack = new(
+            "Item: Heartsteel",
+            "Max Permanent Health",
+            600f,
+            "Maximum permanent health for each stack of Heartsteel.",
+            new System.Collections.Generic.List<string>()
+            {
+                "ITEM_HEARTSTEEL_DESC"
+            }
+        );
+
+        public static ConfigurableValue<float> firstStackIncreaseNumber = new(
+            "Item: Heartsteel",
+            "Health Gain (First Stack)",
+            3f,
+            "Percentage of max health gained as permanent base health when killing an elite enemy.",
+            new System.Collections.Generic.List<string>()
+            {
+                "ITEM_HEARTSTEEL_DESC"
+            }
+        );
         public static float firstStackIncreasePercent = firstStackIncreaseNumber / 100f;
-        public static float extraStackIncreaseNumber = 1.5f;
+
+        public static ConfigurableValue<float> extraStackIncreaseNumber = new(
+            "Item: Heartsteel",
+            "Health Gain (Extra Stack)",
+            1.5f,
+            "Percentage of max health gained as permanent base health when killing an elite enemy for each additional stack of Heartsteel.",
+            new System.Collections.Generic.List<string>()
+            {
+                "ITEM_HEARTSTEEL_DESC"
+            }
+        );
         public static float extraStackIncreasePercent = extraStackIncreaseNumber / 100f;
 
         public class HeartsteelStatistics : MonoBehaviour
@@ -120,7 +148,7 @@ namespace LeagueItems
 
         public static float CalculateMaxStackableHealth(float itemCount)
         {
-            return itemCount * MAX_HEALTH_BONUS_PER_STACK;
+            return itemCount * maxHealthBonusPerStack;
         }
 
         private static void Hooks()
@@ -221,7 +249,7 @@ namespace LeagueItems
             LanguageAPI.Add("HSDesc",
                 "Upon killing an elite enemy, gain <style=cIsHealth>" + firstStackIncreaseNumber + "%</style> " +
                 "<style=cStack>(+" + extraStackIncreaseNumber + "% per stack)</style> of your max health as permanent base health, up to a max of " +
-                "<style=cIsHealth>" + MAX_HEALTH_BONUS_PER_STACK + "</style> <style=cStack>(+" + MAX_HEALTH_BONUS_PER_STACK + " per stack)</style> bonus health.");
+                "<style=cIsHealth>" + maxHealthBonusPerStack + "</style> <style=cStack>(+" + maxHealthBonusPerStack + " per stack)</style> bonus health.");
 
             // The Lore is, well, flavor. You can write pretty much whatever you want here.
             LanguageAPI.Add("HSLore", "Heartsteel lore.");

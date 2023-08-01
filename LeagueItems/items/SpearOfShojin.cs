@@ -12,9 +12,27 @@ namespace LeagueItems
         public static ItemDef itemDef;
 
         // Gain 40% (+40% per stack) of your base damage as bonus cooldown reduction, up to a maximum bonus of 40% CDR.
-        public const float MAX_BONUS_CDR = 40.0f;
+        public static ConfigurableValue<float> maximumBonusCDR = new(
+            "Item: Spear of Shojin",
+            "Maximum Bonus CDR",
+            40f,
+            "Maximum bonus CDR that can be gained from this item.",
+            new System.Collections.Generic.List<string>()
+            {
+                "ITEM_SPEAROFSHOJIN_DESC"
+            }
+        );
 
-        public static float cdrFromDamageNumber = 40.0f;
+        public static ConfigurableValue<float> cdrFromDamageNumber = new(
+            "Item: Spear of Shojin",
+            "Damage Converted to CDR",
+            40f,
+            "Percent of damage converted to CDR for each stack of Spear of Shojin.",
+            new System.Collections.Generic.List<string>()
+            {
+                "ITEM_SPEAROFSHOJIN_DESC"
+            }
+        );
         public static float cdrFromDamagePercent = cdrFromDamageNumber / 100f;
 
         internal static void Init()
@@ -54,7 +72,7 @@ namespace LeagueItems
             float hyperbolicPercentage = 1 - (1 / (1 + (cdrFromDamagePercent * itemCount)));
             float bonusCDR = hyperbolicPercentage * sender.damage;
             // Cap cooldown reduction
-            return Mathf.Clamp(bonusCDR, 0, MAX_BONUS_CDR);
+            return Mathf.Clamp(bonusCDR, 0, maximumBonusCDR);
         }
 
         private static void Hooks()
@@ -120,7 +138,7 @@ namespace LeagueItems
             // The Description is where you put the actual numbers and give an advanced description.
             LanguageAPI.Add("SoSDesc",
                 "Gain <style=cIsUtility>" + cdrFromDamageNumber + "%</style> <style=cStack>(+" + cdrFromDamageNumber + "% per stack)</style> " +
-                "of your base damage as bonus cooldown reduction, up to a maximum bonus of <style=cIsUtility>" + MAX_BONUS_CDR + "%</style> CDR.");
+                "of your base damage as bonus cooldown reduction, up to a maximum bonus of <style=cIsUtility>" + maximumBonusCDR + "%</style> CDR.");
 
             // The Lore is, well, flavor. You can write pretty much whatever you want here.
             LanguageAPI.Add("SoSLore", "A jade spear.");
