@@ -82,7 +82,7 @@ namespace LeagueItems
                 );
                 BetterUI.ItemStats.RegisterStat(
                     itemDef: DeathsDance.itemDef,
-                    "Total Damage Taken",
+                    "Total Damage Delayed",
                     1f,
                     1f,
                     statFormatter: DeathsDanceTakenFormatter

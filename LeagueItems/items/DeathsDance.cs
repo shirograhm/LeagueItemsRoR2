@@ -255,6 +255,8 @@ namespace LeagueItems
                     var itemStats = self.inventory.GetComponent<DeathsDanceStatistics>();
                     itemStats.TotalDamageTaken += damageToTake;
 
+                    itemStats.TotalDamageTaken = itemStats.TotalDamageTaken < 0 ? 0 : itemStats.TotalDamageTaken;
+
 #pragma warning disable Publicizer001 // Accessing a member that was not originally public
                     self.SetBuffCount(defianceBuff.buffIndex, defianceStackCount - damageToTake);
 #pragma warning restore Publicizer001 // Accessing a member that was not originally public
@@ -286,6 +288,8 @@ namespace LeagueItems
                         {
                             var itemStats = damageReport.attackerBody.inventory.GetComponent<DeathsDanceStatistics>();
                             itemStats.TotalDamageCleansed += stackCount;
+
+                            itemStats.TotalDamageTaken -= stackCount;
 
 #pragma warning disable Publicizer001 // Accessing a member that was not originally public
                             damageReport.attackerBody.SetBuffCount(defianceBuff.buffIndex, 0);
