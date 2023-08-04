@@ -14,11 +14,11 @@ namespace LeagueItems
     {
         public static ItemDef itemDef;
 
-        // Heal for 20% (+20% per stack) of damage dealt.
+        // Heal for 14% (+14% per stack) of damage dealt.
         public static ConfigurableValue<float> bonusLifestealNumber = new(
             "Item: Bloodthirster",
             "Lifesteal On-Hit",
-            20f,
+            14f,
             "Percent of on-hit damage dealt recovered as health for each stack of Bloodthirster.",
             new System.Collections.Generic.List<string>()
             {

@@ -14,11 +14,11 @@ namespace LeagueItems
     {
         public static ItemDef itemDef;
 
-        // Gain 30% (+30% per stack) crit chance and 60% (+60% per stack) crit damage.
+        // Gain 20% (+20% per stack) crit chance and 60% (+60% per stack) crit damage.
         public static ConfigurableValue<float> critChanceIncreaseNumber = new(
             "Item: Infinity Edge",
             "Crit Chance",
-            30f,
+            20f,
             "Crit chance gained for each stack of Infinity Edge.",
             new System.Collections.Generic.List<string>()
             {

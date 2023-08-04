@@ -11,11 +11,11 @@ namespace LeagueItems
     {
         public static ItemDef itemDef;
 
-        // All damage dealt ignores 60 (+40 per stack) flat armor.
+        // All damage dealt ignores 80 (+40 per stack) flat armor.
         public static ConfigurableValue<float> armorIgnoredFirstStackNumber = new(
             "Item: Duskblade of Draktharr",
             "Armor Penetration (First Stack)",
-            60f,
+            80f,
             "Armor penetration for the first stack of Duskblade.",
             new System.Collections.Generic.List<string>()
             {
@@ -106,7 +106,7 @@ namespace LeagueItems
                 "<style=cStack>(+" + armorIgnoredExtraStackNumber + " per stack)</style> flat armor.");
 
             // The Lore is, well, flavor. You can write pretty much whatever you want here.
-            LanguageAPI.Add("DoDLore", "Duskblade lore.");
+            LanguageAPI.Add("DoDLore", "");
         }
     }
 }
