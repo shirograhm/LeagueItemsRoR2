@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 811336865
+CRC: 1219927907
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: bc2e3007b97d788e273eb96cbf1897fc
+    Hash: 4f028adbbe3089aa7d96424ced60ce0c
   TypeTreeHash:
     serializedVersion: 2
     Hash: 21747e4ee48f36c7a65f9afbfd77f392
@@ -104,6 +104,7 @@ Assets:
 - Assets/Models/Prefabs/Item/InfinityEdge/textures/Wings_roughness.jpeg
 - Assets/Textures/Icons/Item/BotRK_full.png
 - Assets/Textures/Icons/Item/TitanicHydra.png
+- Assets/Models/Prefabs/Item/DuskbladeOfDraktharr/DuskbladeOfDraktharr.prefab
 - Assets/Models/Prefabs/Item/InfinityEdge/textures/Runes_emissive.jpeg
 - Assets/Models/Prefabs/Item/InfinityEdge/textures/H_Bevel_normal.png
 - Assets/Models/Prefabs/Item/InfinityEdge/textures/Wings_metallic.jpeg

@@ -60,7 +60,7 @@ namespace LeagueItems
             });
 
             itemDef.pickupIconSprite = LeagueItemsPlugin.MainAssets.LoadAsset<Sprite>("DuskbladeOfDraktharr.png");
-            itemDef.pickupModelPrefab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Mystery/PickupMystery.prefab").WaitForCompletion();
+            itemDef.pickupModelPrefab = LeagueItemsPlugin.MainAssets.LoadAsset<GameObject>("DuskbladeOfDraktharr.prefab");
             itemDef.canRemove = true;
             itemDef.hidden = false;
         }
