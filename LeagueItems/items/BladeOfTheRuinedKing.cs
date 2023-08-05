@@ -31,6 +31,17 @@ namespace LeagueItems
         );
         public static float onHitDamagePercent = onHitDamageNumber / 100f;
 
+        public static ConfigurableValue<bool> shouldCapBorkDamage = new(
+            "Item: Blade of the Ruined King",
+            "Cap On-Hit Damage",
+            true,
+            "Whether or not the on-hit damage should be capped at a certain ratio of the attack's base damage. If false, BotRK on-hit damage has no cap.",
+            new System.Collections.Generic.List<string>()
+            {
+                "ITEM_BLADEOFTHERUINEDKING_DESC"
+            }
+        );
+
         public static ConfigurableValue<float> maximumDamageCap = new(
             "Item: Blade of the Ruined King",
             "Max Damage Cap",
@@ -168,9 +179,13 @@ namespace LeagueItems
 
                     if (itemCount > 0 && damageInfo.procCoefficient > 0)
                     {
-                        float tempDamage = victimBody.healthComponent.health * damageInfo.procCoefficient * hyperbolicPercentage;
-                        // Damage cannot exceed maxDamageCap% of the initial hit damage
-                        float botrkDamage = Mathf.Clamp(tempDamage, 0.0f, maximumDamageCapPercent * damageInfo.damage);
+                        float botrkDamage = victimBody.healthComponent.health * damageInfo.procCoefficient * hyperbolicPercentage;
+
+                        if (shouldCapBorkDamage)
+                        {
+                            // If capped, damage cannot exceed maxDamageCap% of the initial attack's damage
+                            botrkDamage = Mathf.Clamp(botrkDamage, 0.0f, maximumDamageCapPercent * damageInfo.damage);
+                        }
 
                         DamageInfo botrkProc = new()
                         {
@@ -240,9 +255,18 @@ namespace LeagueItems
             LanguageAPI.Add("BotrkPickup", "Deal a percentage of enemies current health as bonus damage on-hit.");
 
             // The Description is where you put the actual numbers and give an advanced description.
-            LanguageAPI.Add("BotrkDesc", 
-                "Deal <style=cIsDamage>" + onHitDamageNumber + "%</style> <style=cStack>(+" + onHitDamageNumber + "% per stack)</style> " +
-                "of enemy current health as bonus damage on-hit, up to a maximum of <style=cIsDamage>" + maximumDamageCap + "%</style> of the initial damage.");
+            string desc = "Deal <style=cIsDamage>" + onHitDamageNumber + "%</style> <style=cStack>(+" + onHitDamageNumber + "% per stack)</style> " +
+                "of enemy current health as bonus damage on-hit";
+
+            if (shouldCapBorkDamage)
+            {
+                desc += ", up to a maximum of <style=cIsDamage>" + maximumDamageCap + "%</style> of the initial damage.";
+            }
+            else
+            {
+                desc += ".";
+            }
+            LanguageAPI.Add("BotrkDesc", desc);
 
             // The Lore is, well, flavor. You can write pretty much whatever you want here.
             LanguageAPI.Add("BotrkLore", "A sword belonging to the Shadow Isles.");

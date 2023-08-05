@@ -372,7 +372,7 @@ namespace LeagueItems
                 style = BetterUI.ItemStats.Styles.Health,
                 statFormatter = (sb, value, master) =>
                 {
-                    if(!master.inventory) return;
+                    if (!master.inventory) return;
 
                     var component = master.inventory.GetComponent<Heartsteel.HeartsteelStatistics>();
 
@@ -388,7 +388,11 @@ namespace LeagueItems
                         sb.Append("0");
                     }
 
-                    sb.Append("/" + String.Format("{0:#}", Heartsteel.CalculateMaxStackableHealth(value)));
+                    // If HS is limited, then add limit to UI text.
+                    if (Heartsteel.maxHealthBonusPerStack > 0)
+                    {
+                        sb.Append("/" + String.Format("{0:#}", Heartsteel.CalculateMaxStackableHealth(value)));
+                    }
                 }
             };
 

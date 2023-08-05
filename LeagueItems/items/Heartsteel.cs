@@ -19,7 +19,7 @@ namespace LeagueItems
             "Item: Heartsteel",
             "Max Permanent Health",
             600f,
-            "Maximum permanent health for each stack of Heartsteel.",
+            "Maximum permanent health for each stack of Heartsteel. Set this to -1 to remove the cap completely.",
             new System.Collections.Generic.List<string>()
             {
                 "ITEM_HEARTSTEEL_DESC"
@@ -193,8 +193,11 @@ namespace LeagueItems
 
                     if (itemCount > 0 && itemStats)
                     {
-                        // Cap max heartsteel health increase based on stacks
-                        itemStats.TotalBonusHealth = Mathf.Clamp(itemStats.TotalBonusHealth, 0, CalculateMaxStackableHealth(itemCount));
+                        // Cap max heartsteel health increase based on stacks IFF bonus is > 0 (if bonus is -1, have no limit)
+                        if (maxHealthBonusPerStack > 0)
+                        {
+                            itemStats.TotalBonusHealth = Mathf.Clamp(itemStats.TotalBonusHealth, 0, CalculateMaxStackableHealth(itemCount));
+                        }
 
                         args.baseHealthAdd += itemStats.TotalBonusHealth;
                     }
@@ -246,10 +249,18 @@ namespace LeagueItems
             LanguageAPI.Add("HSPickup", "Gain stacking movement speed over time. Expend max stacks to deal bonus damage on-hit.");
 
             // The Description is where you put the actual numbers and give an advanced description.
-            LanguageAPI.Add("HSDesc",
-                "Upon killing an elite enemy, gain <style=cIsHealth>" + firstStackIncreaseNumber + "%</style> " +
-                "<style=cStack>(+" + extraStackIncreaseNumber + "% per stack)</style> of your max health as permanent base health, up to a max of " +
-                "<style=cIsHealth>" + maxHealthBonusPerStack + "</style> <style=cStack>(+" + maxHealthBonusPerStack + " per stack)</style> bonus health.");
+            string desc = "Upon killing an elite enemy, gain <style=cIsHealth>" + firstStackIncreaseNumber + "%</style> " +
+                "<style=cStack>(+" + extraStackIncreaseNumber + "% per stack)</style> of your max health as permanent base health";
+
+            if (maxHealthBonusPerStack < 0)
+            {
+                desc += ".";
+            }
+            else
+            {
+                desc += ", up to a max of <style=cIsHealth>" + maxHealthBonusPerStack + "</style> <style=cStack>(+" + maxHealthBonusPerStack + " per stack)</style> bonus health.";
+            }
+            LanguageAPI.Add("HSDesc", desc);
 
             // The Lore is, well, flavor. You can write pretty much whatever you want here.
             LanguageAPI.Add("HSLore", "Heartsteel lore.");
