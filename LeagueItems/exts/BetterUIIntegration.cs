@@ -199,6 +199,22 @@ namespace LeagueItems
                 // Wit's End
                 BetterUI.ItemStats.RegisterStat(
                     itemDef: WitsEnd.itemDef,
+                    "Attack Speed Per Stack",
+                    WitsEnd.attackSpeedPerStackPercent,
+                    WitsEnd.attackSpeedPerStackPercent,
+                    stackingFormula: BetterUI.ItemStats.LinearStacking,
+                    statFormatter: BetterUI.ItemStats.StatFormatter.Percent
+                );
+                BetterUI.ItemStats.RegisterStat(
+                    itemDef: WitsEnd.itemDef,
+                    "Movement Speed Per Stack",
+                    WitsEnd.movementSpeedPerStackPercent,
+                    WitsEnd.movementSpeedPerStackPercent,
+                    stackingFormula: BetterUI.ItemStats.LinearStacking,
+                    statFormatter: BetterUI.ItemStats.StatFormatter.Percent
+                );
+                BetterUI.ItemStats.RegisterStat(
+                    itemDef: WitsEnd.itemDef,
                     "Fray Stack Duration",
                     WitsEnd.frayDurationPerStack,
                     WitsEnd.frayDurationPerStack,

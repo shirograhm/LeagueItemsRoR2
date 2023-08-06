@@ -16,11 +16,11 @@ namespace LeagueItems
         public static BuffDef frayBuff;
 
         // Gain a stack of Fray on-hit.
-        // Each stack of Fray grants 2% (+2% per stack) bonus attack and movement speed and lasts for 2 (+2 per stack) seconds.
+        // Each stack of Fray grants 1% (+1% per stack) bonus attack speed and 1% (+1% per stack) bonus movement speed for 4 (+4 per stack) seconds.
         public static ConfigurableValue<float> frayDurationPerStack = new(
             "Item: Wits End",
             "Fray Stack Duration",
-            2f,
+            4f,
             "Duration of each Fray stack.",
             new System.Collections.Generic.List<string>()
             {
@@ -28,18 +28,30 @@ namespace LeagueItems
             }
         );
 
-        public static ConfigurableValue<float> statPerStackNumber = new(
+        public static ConfigurableValue<float> attackSpeedPerStackNumber = new(
             "Item: Wits End",
-            "Attack & Movement Speed Bonus",
-            2f,
-            "Bonus attack and movement speed gained for each stack of Fray.",
+            "Attack Speed Bonus",
+            1f,
+            "Bonus attack speed gained for each stack of Fray.",
             new System.Collections.Generic.List<string>()
             {
                 "ITEM_WITSEND_DESC"
             }
         );
-        public static float statPerStackPercent = statPerStackNumber / 100f;
-        
+        public static float attackSpeedPerStackPercent = attackSpeedPerStackNumber / 100f;
+
+        public static ConfigurableValue<float> movementSpeedPerStackNumber = new(
+            "Item: Wits End",
+            "Movement Speed Bonus",
+            1f,
+            "Bonus movement speed gained for each stack of Fray.",
+            new System.Collections.Generic.List<string>()
+            {
+                "ITEM_WITSEND_DESC"
+            }
+        );
+        public static float movementSpeedPerStackPercent = movementSpeedPerStackNumber / 100f;
+
         internal static void Init()
         {
             GenerateItem();
@@ -83,9 +95,14 @@ namespace LeagueItems
             frayBuff.canStack = true;
         }
 
-        public static float CalculateStatIncreasePercent(int itemCount)
+        public static float CalculateAttackSpeedIncreasePercent(int itemCount)
         {
-            return statPerStackPercent * itemCount;
+            return attackSpeedPerStackPercent * itemCount;
+        }
+
+        public static float CalculateMovementSpeedIncreasePercent(int itemCount)
+        {
+            return movementSpeedPerStackPercent * itemCount;
         }
 
         public static float CalculateFrayDuration(int itemCount)
@@ -105,8 +122,8 @@ namespace LeagueItems
                     {
                         int frayStackCount = sender.GetBuffCount(frayBuff);
 
-                        args.attackSpeedMultAdd += frayStackCount * CalculateStatIncreasePercent(itemCount);
-                        args.moveSpeedMultAdd += frayStackCount * CalculateStatIncreasePercent(itemCount);
+                        args.attackSpeedMultAdd += frayStackCount * CalculateAttackSpeedIncreasePercent(itemCount);
+                        args.moveSpeedMultAdd += frayStackCount * CalculateMovementSpeedIncreasePercent(itemCount);
                     }
                 }
             };
@@ -150,9 +167,10 @@ namespace LeagueItems
 
             // The Description is where you put the actual numbers and give an advanced description.
             LanguageAPI.Add("WEDesc", 
-                "Gain a stack of Fray on-hit. Each stack of Fray grants <style=cIsUtility>" + statPerStackNumber + "%</style> " +
-                "<style=cStack>(+" + statPerStackNumber + "% per stack)</style> bonus attack and movement speed, and lasts for " +
-                "<style=cIsUtility>" + frayDurationPerStack + "</style> <style=cStack>(+" + frayDurationPerStack + " per stack)</style> seconds.");
+                "Gain a stack of Fray on-hit. Each stack of Fray grants " +
+                "<style=cIsUtility>" + attackSpeedPerStackNumber + "%</style> <style=cStack>(+" + attackSpeedPerStackNumber + "% per stack)</style> bonus attack speed and " +
+                "<style=cIsUtility>" + movementSpeedPerStackNumber + "%</style> <style=cStack>(+" + movementSpeedPerStackNumber + "% per stack)</style> bonus movement speed " +
+                "for <style=cIsUtility>" + frayDurationPerStack + "</style> <style=cStack>(+" + frayDurationPerStack + " per stack)</style> seconds.");
 
             // The Lore is, well, flavor. You can write pretty much whatever you want here.
             LanguageAPI.Add("WELore", "You are at your wit's end.");
