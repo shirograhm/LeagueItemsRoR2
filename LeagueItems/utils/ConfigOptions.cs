@@ -22,7 +22,9 @@ namespace LeagueItems
             if (reloadLogbook)
             {
                 reloadLogbook = false;
+#pragma warning disable Publicizer001 // Accessing a member that was not originally public
                 RoR2.UI.LogBook.LogBookController.BuildStaticData();
+#pragma warning restore Publicizer001 // Accessing a member that was not originally public
             }
         }
 

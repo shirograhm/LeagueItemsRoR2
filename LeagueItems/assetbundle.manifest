@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 1219927907
+CRC: 1939374929
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 4f028adbbe3089aa7d96424ced60ce0c
+    Hash: cb46f54aeb18bc5d9f1421a1a11df71d
   TypeTreeHash:
     serializedVersion: 2
     Hash: 21747e4ee48f36c7a65f9afbfd77f392
@@ -53,8 +53,10 @@ Assets:
 - Assets/Models/Prefabs/Item/InfinityEdge/textures/lambert1_normal.png
 - Assets/Models/Prefabs/Item/InfinityEdge/textures/Runes_AO.jpeg
 - Assets/Models/Prefabs/Item/InfinityEdge/textures/Handle_normal.png
+- Assets/Models/Prefabs/Item/GuinsoosRageblade/Rageblade.prefab
 - Assets/Models/Prefabs/Item/BotRK/Materials/blade_material.mat
 - Assets/Models/Prefabs/Item/InfinityEdge/textures/Handle_AO.jpeg
+- Assets/Models/Prefabs/Item/Bloodthirster/Bloodthirster.prefab
 - Assets/Models/Prefabs/Item/SpearOfShojin/SpearOfShojin.prefab
 - Assets/Models/Prefabs/Item/InfinityEdge/textures/Handle_roughness.jpeg
 - Assets/Models/Prefabs/Item/BotRK/textures/lambert1_Metallic.png
