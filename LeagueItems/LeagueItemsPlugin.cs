@@ -23,7 +23,7 @@ namespace LeagueItems
     {
         public const string PluginGUID = "com.shirograhm.leagueitems";
         public const string PluginName = "LeagueItems";
-        public const string PluginVersion = "0.9.5";
+        public const string PluginVersion = "0.9.6";
 
         public const int DEBUG = 0;
 
