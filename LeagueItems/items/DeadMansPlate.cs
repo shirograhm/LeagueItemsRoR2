@@ -26,7 +26,7 @@ namespace LeagueItems
             "Movespeed Gain",
             3.0f,
             "Percent of movement speed gained for each stack of Momentum.",
-            new System.Collections.Generic.List<string>()
+            new List<string>()
             {
                 "ITEM_DEADMANSPLATE_DESC"
             }
@@ -38,7 +38,7 @@ namespace LeagueItems
             "Damage Proc",
             500.0f,
             "Proc damage dealt at full Momentum for each stack of Dead Man's Plate.",
-            new System.Collections.Generic.List<string>()
+            new List<string>()
             {
                 "ITEM_DEADMANSPLATE_DESC"
             }

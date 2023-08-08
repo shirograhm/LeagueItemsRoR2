@@ -20,7 +20,7 @@ namespace LeagueItems
             "Lifesteal On-Hit",
             14f,
             "Percent of on-hit damage dealt recovered as health for each stack of Bloodthirster.",
-            new System.Collections.Generic.List<string>()
+            new List<string>()
             {
                 "ITEM_BLOODTHIRSTER_DESC"
             }
@@ -208,7 +208,7 @@ namespace LeagueItems
                 "<style=cStack>(+" + bonusLifestealNumber + "% per stack)</style> of the damage dealt.");
 
             // The Lore is, well, flavor. You can write pretty much whatever you want here.
-            LanguageAPI.Add("BTLore", "A large sword.");
+            LanguageAPI.Add("BTLore", "");
         }
     }
 }

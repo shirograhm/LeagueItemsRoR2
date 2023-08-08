@@ -22,7 +22,7 @@ namespace LeagueItems
             "On-Hit Damage (First Stack)",
             15f,
             "On-hit damage for the first stack of Nashor's Tooth.",
-            new System.Collections.Generic.List<string>()
+            new List<string>()
             {
                 "ITEM_NASHORSTOOTH_DESC"
             }
@@ -33,7 +33,7 @@ namespace LeagueItems
             "On-Hit Damage (Extra Stack)",
             5f,
             "On-hit damage for each additional stack of Nashor's Tooth.",
-            new System.Collections.Generic.List<string>()
+            new List<string>()
             {
                 "ITEM_NASHORSTOOTH_DESC"
             }
@@ -257,7 +257,7 @@ namespace LeagueItems
                 "+" + levelDamageMultiplier + " per level</style>) damage on-hit.");
 
             // The Lore is, well, flavor. You can write pretty much whatever you want here.
-            LanguageAPI.Add("NTLore", "A stolen tooth from a great beast.");
+            LanguageAPI.Add("NTLore", "");
         }
     }
 }

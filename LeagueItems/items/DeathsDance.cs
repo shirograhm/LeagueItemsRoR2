@@ -25,7 +25,7 @@ namespace LeagueItems
             "Damage Over Time",
             2.0f,
             "Maximum percent health damage that can be taken from Defiance stacks each second.",
-            new System.Collections.Generic.List<string>()
+            new List<string>()
             {
                 "ITEM_DEATHSDANCE_DESC"
             }
@@ -37,7 +37,7 @@ namespace LeagueItems
             "Damage Reduction",
             28f,
             "Damage reduction for each stack of Death's Dance.",
-            new System.Collections.Generic.List<string>()
+            new List<string>()
             {
                 "ITEM_DEATHSDANCE_DESC"
             }
@@ -346,7 +346,7 @@ namespace LeagueItems
                 "<style=cIsDamage>" + maxDamagePerSecond + "%</style> of your max health per second. When you kill an elite enemy, cleanse all remaining stacks.");
 
             // The Lore is, well, flavor. You can write pretty much whatever you want here.
-            LanguageAPI.Add("DDLore", "Death's Dance lore.");
+            LanguageAPI.Add("DDLore", "");
         }
     }
 }

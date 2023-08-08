@@ -17,7 +17,7 @@ namespace LeagueItems
             "Maximum Bonus CDR",
             40f,
             "Maximum bonus CDR that can be gained from this item.",
-            new System.Collections.Generic.List<string>()
+            new List<string>()
             {
                 "ITEM_SPEAROFSHOJIN_DESC"
             }
@@ -28,7 +28,7 @@ namespace LeagueItems
             "Damage Converted to CDR",
             40f,
             "Percent of damage converted to CDR for each stack of Spear of Shojin.",
-            new System.Collections.Generic.List<string>()
+            new List<string>()
             {
                 "ITEM_SPEAROFSHOJIN_DESC"
             }
@@ -141,7 +141,7 @@ namespace LeagueItems
                 "of your base damage as bonus cooldown reduction, up to a maximum bonus of <style=cIsUtility>" + maximumBonusCDR + "%</style> CDR.");
 
             // The Lore is, well, flavor. You can write pretty much whatever you want here.
-            LanguageAPI.Add("SoSLore", "A jade spear.");
+            LanguageAPI.Add("SoSLore", "");
         }
     }
 }

@@ -17,7 +17,7 @@ namespace LeagueItems
             "Max Health Coverted (First Stack)",
             2.5f,
             "Percentage of maximum health gained as bonus damage for the first stack of Titanic Hydra.",
-            new System.Collections.Generic.List<string>()
+            new List<string>()
             {
                 "ITEM_SPEAROFSHOJIN_DESC"
             }
@@ -29,7 +29,7 @@ namespace LeagueItems
             "Max Health Coverted (Extra Stack)",
             1f,
             "Percentage of maximum health gained as bonus damage for each additional stack of Titanic Hydra.",
-            new System.Collections.Generic.List<string>()
+            new List<string>()
             {
                 "ITEM_SPEAROFSHOJIN_DESC"
             }
@@ -139,7 +139,7 @@ namespace LeagueItems
                 "<style=cStack>(+" + extraStackBonusNumber + "% per stack)</style> of max health.");
 
             // The Lore is, well, flavor. You can write pretty much whatever you want here.
-            LanguageAPI.Add("THLore", "A large weapon.");
+            LanguageAPI.Add("THLore", "");
         }
     }
 }

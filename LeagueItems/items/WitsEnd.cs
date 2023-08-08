@@ -22,7 +22,7 @@ namespace LeagueItems
             "Fray Stack Duration",
             4f,
             "Duration of each Fray stack.",
-            new System.Collections.Generic.List<string>()
+            new List<string>()
             {
                 "ITEM_WITSEND_DESC"
             }
@@ -33,7 +33,7 @@ namespace LeagueItems
             "Attack Speed Bonus",
             1f,
             "Bonus attack speed gained for each stack of Fray.",
-            new System.Collections.Generic.List<string>()
+            new List<string>()
             {
                 "ITEM_WITSEND_DESC"
             }
@@ -45,7 +45,7 @@ namespace LeagueItems
             "Movement Speed Bonus",
             1f,
             "Bonus movement speed gained for each stack of Fray.",
-            new System.Collections.Generic.List<string>()
+            new List<string>()
             {
                 "ITEM_WITSEND_DESC"
             }
@@ -166,14 +166,30 @@ namespace LeagueItems
             LanguageAPI.Add("WEPickup", "Gain temporary attack speed and movement speed on-hit.");
 
             // The Description is where you put the actual numbers and give an advanced description.
-            LanguageAPI.Add("WEDesc", 
-                "Gain a stack of Fray on-hit. Each stack of Fray grants " +
-                "<style=cIsUtility>" + attackSpeedPerStackNumber + "%</style> <style=cStack>(+" + attackSpeedPerStackNumber + "% per stack)</style> bonus attack speed and " +
-                "<style=cIsUtility>" + movementSpeedPerStackNumber + "%</style> <style=cStack>(+" + movementSpeedPerStackNumber + "% per stack)</style> bonus movement speed " +
-                "for <style=cIsUtility>" + frayDurationPerStack + "</style> <style=cStack>(+" + frayDurationPerStack + " per stack)</style> seconds.");
+            string desc = "Gain a stack of Fray on-hit. Each stack of Fray grants ";
+
+            if (attackSpeedPerStackNumber > 0)
+            {
+                desc += "<style=cIsUtility>" + attackSpeedPerStackNumber + "%</style> <style=cStack>(+" + attackSpeedPerStackNumber + "% per stack)</style> bonus attack speed ";
+            }
+            if (movementSpeedPerStackNumber > 0)
+            {
+                if(attackSpeedPerStackNumber > 0)
+                {
+                    desc += "and ";
+                }
+                desc += "<style=cIsUtility>" + movementSpeedPerStackNumber + "%</style> <style=cStack>(+" + movementSpeedPerStackNumber + "% per stack)</style> bonus movement speed ";
+            }
+            if (attackSpeedPerStackNumber == 0 && movementSpeedPerStackNumber == 0)
+            {
+                desc += "nothing ";
+            }
+            desc += "for <style=cIsUtility>" + frayDurationPerStack + "</style> <style=cStack>(+" + frayDurationPerStack + " per stack)</style> seconds.";
+
+            LanguageAPI.Add("WEDesc", desc);
 
             // The Lore is, well, flavor. You can write pretty much whatever you want here.
-            LanguageAPI.Add("WELore", "You are at your wit's end.");
+            LanguageAPI.Add("WELore", "");
         }
     }
 }

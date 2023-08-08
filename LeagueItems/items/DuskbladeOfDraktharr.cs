@@ -17,7 +17,7 @@ namespace LeagueItems
             "Armor Penetration (First Stack)",
             80f,
             "Armor penetration for the first stack of Duskblade.",
-            new System.Collections.Generic.List<string>()
+            new List<string>()
             {
                 "ITEM_DUSKBLADE_DESC"
             }
@@ -27,7 +27,7 @@ namespace LeagueItems
             "Armor Penetration (Extra Stack)",
             40f,
             "Armor penetration for each additional stack of Duskblade.",
-            new System.Collections.Generic.List<string>()
+            new List<string>()
             {
                 "ITEM_DUSKBLADE_DESC"
             }

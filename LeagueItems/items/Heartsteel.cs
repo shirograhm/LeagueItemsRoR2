@@ -20,7 +20,7 @@ namespace LeagueItems
             "Max Permanent Health",
             600f,
             "Maximum permanent health for each stack of Heartsteel. Set this to -1 to remove the cap completely.",
-            new System.Collections.Generic.List<string>()
+            new List<string>()
             {
                 "ITEM_HEARTSTEEL_DESC"
             }
@@ -31,7 +31,7 @@ namespace LeagueItems
             "Health Gain (First Stack)",
             3f,
             "Percentage of max health gained as permanent base health when killing an elite enemy.",
-            new System.Collections.Generic.List<string>()
+            new List<string>()
             {
                 "ITEM_HEARTSTEEL_DESC"
             }
@@ -43,7 +43,7 @@ namespace LeagueItems
             "Health Gain (Extra Stack)",
             1.5f,
             "Percentage of max health gained as permanent base health when killing an elite enemy for each additional stack of Heartsteel.",
-            new System.Collections.Generic.List<string>()
+            new List<string>()
             {
                 "ITEM_HEARTSTEEL_DESC"
             }
@@ -164,7 +164,7 @@ namespace LeagueItems
 
                 if (!NetworkServer.active) return;
 
-                if (!damageReport.victim || !damageReport.attacker)
+                if (!damageReport.victim || !damageReport.attackerBody)
                 {
                     return;
                 }
@@ -263,7 +263,7 @@ namespace LeagueItems
             LanguageAPI.Add("HSDesc", desc);
 
             // The Lore is, well, flavor. You can write pretty much whatever you want here.
-            LanguageAPI.Add("HSLore", "Heartsteel lore.");
+            LanguageAPI.Add("HSLore", "");
         }
     }
 }

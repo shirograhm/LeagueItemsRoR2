@@ -20,7 +20,7 @@ namespace LeagueItems
             "Crit Chance",
             20f,
             "Crit chance gained for each stack of Infinity Edge.",
-            new System.Collections.Generic.List<string>()
+            new List<string>()
             {
                 "ITEM_INFINITYEDGE_DESC"
             }
@@ -32,7 +32,7 @@ namespace LeagueItems
             "Crit Damage",
             60f,
             "Crit damage gained for each stack of Infinity Edge.",
-            new System.Collections.Generic.List<string>()
+            new List<string>()
             {
                 "ITEM_HEARTSTEEL_DESC"
             }
@@ -153,7 +153,7 @@ namespace LeagueItems
                 "and <style=cIsUtility>" + critDamageIncreaseNumber + "%</style> <style=cStack>(+" + critDamageIncreaseNumber + "% per stack)</style> crit damage.");
 
             // The Lore is, well, flavor. You can write pretty much whatever you want here.
-            LanguageAPI.Add("IELore", "Infinity edge lore.");
+            LanguageAPI.Add("IELore", "");
         }
     }
 }

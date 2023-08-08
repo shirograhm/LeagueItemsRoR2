@@ -154,6 +154,15 @@ namespace LeagueItems
                     statFormatter: BetterUI.ItemStats.StatFormatter.Percent,
                     itemTag: BetterUI.ItemStats.ItemTag.Luck
                 );
+                // Mejai's Soulstealer
+                BetterUI.ItemStats.RegisterStat(
+                    itemDef: MejaisSoulstealer.itemDef,
+                    "Bonus Damage",
+                    1f,
+                    1f,
+                    statFormatter: MejaisBonusDamageFormatter,
+                    itemTag: BetterUI.ItemStats.ItemTag.Damage
+                );
                 // Nashor's Tooth
                 BetterUI.ItemStats.RegisterStat(
                     itemDef: NashorsTooth.itemDef,
@@ -409,6 +418,23 @@ namespace LeagueItems
                     {
                         sb.Append("/" + String.Format("{0:#}", Heartsteel.CalculateMaxStackableHealth(value)));
                     }
+                }
+            };
+
+            public static BetterUI.ItemStats.StatFormatter MejaisBonusDamageFormatter = new()
+            {
+                suffix = "",
+                style = BetterUI.ItemStats.Styles.Damage,
+                statFormatter = (sb, value, master) =>
+                {
+                    if (!master.hasBody) return;
+
+                    float bonusDamage = MejaisSoulstealer.CalculateMejaisBonusDamage(master.GetBody(), value);
+                    float totalDamage = MejaisSoulstealer.CalculateMejaisTotalDamage(value);
+                    string bonusDamageText = bonusDamage == 0 ? "0" : String.Format("{0:#.#}", bonusDamage);
+                    string totalDamageText = totalDamage == 0 ? "0" : String.Format("{0:#.#}", totalDamage);
+
+                    sb.AppendFormat(bonusDamageText + "/" + totalDamageText);
                 }
             };
 

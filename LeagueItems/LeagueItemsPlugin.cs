@@ -72,6 +72,7 @@ namespace LeagueItems
             GuinsoosRageblade.Init();
             Heartsteel.Init();
             InfinityEdge.Init();
+            MejaisSoulstealer.Init();
             NashorsTooth.Init();
             SpearOfShojin.Init();
             TitanicHydra.Init();

@@ -22,7 +22,7 @@ namespace LeagueItems
             "On-Hit Damage (First Stack)",
             0.75f,
             "On-hit damage for every 1% of crit chance.",
-            new System.Collections.Generic.List<string>()
+            new List<string>()
             {
                 "ITEM_GUINSOOSRAGEBLADE_DESC"
             }
@@ -32,7 +32,7 @@ namespace LeagueItems
             "On-Hit Damage (Extra Stack)",
             0.75f,
             "Additional damage on-hit for every 1% of crit chance for every additional stack of Guinsoo's Rageblade.",
-            new System.Collections.Generic.List<string>()
+            new List<string>()
             {
                 "ITEM_GUINSOOSRAGEBLADE_DESC"
             }
@@ -222,7 +222,7 @@ namespace LeagueItems
                 "<style=cStack>(+" + extraStackDamagePerCrit + " per stack) damage on-hit.");
 
             // The Lore is, well, flavor. You can write pretty much whatever you want here.
-            LanguageAPI.Add("GRLore", "A very angry blade.");
+            LanguageAPI.Add("GRLore", "");
         }
     }
 }

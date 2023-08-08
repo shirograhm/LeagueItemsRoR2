@@ -20,7 +20,7 @@ namespace LeagueItems
             "Max Health Gained (First Stack)",
             50f,
             "Percentage of maximum health gained as bonus health for the first stack of Warmog's Armor.",
-            new System.Collections.Generic.List<string>()
+            new List<string>()
             {
                 "ITEM_WARMOGS_DESC"
             }
@@ -32,7 +32,7 @@ namespace LeagueItems
             "Max Health Gained (Extra Stack)",
             25f,
             "Percentage of maximum health gained as bonus health for each additional stack of Warmog's Armor.",
-            new System.Collections.Generic.List<string>()
+            new List<string>()
             {
                 "ITEM_WARMOGS_DESC"
             }
@@ -160,9 +160,7 @@ namespace LeagueItems
                 "<style=cStack>(+" + extraStackIncreaseNumber + "% per stack)</style> of your base health as bonus health.");
 
             // The Lore is, well, flavor. You can write pretty much whatever you want here.
-            LanguageAPI.Add("WALore", "The living armor protected the greatest troll warrior in the entire realm during the bloodiest and most devastating battles of the Rune Wars. " +
-                                "Deep within the dark woods of Crystone the living armor waits to protect its next owner. A word of warning required before seeking out Warmog... " +
-                                "it will protect you for a time, but when it grows tired of you, who will protect you from it?");
+            LanguageAPI.Add("WALore", "");
         }
     }
 }

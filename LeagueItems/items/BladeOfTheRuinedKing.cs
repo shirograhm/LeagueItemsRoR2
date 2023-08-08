@@ -24,7 +24,7 @@ namespace LeagueItems
             "On-Hit Damage",
             1.0f,
             "Percent of current health done on-hit for each stack of BotRK.",
-            new System.Collections.Generic.List<string>()
+            new List<string>()
             {
                 "ITEM_BLADEOFTHERUINEDKING_DESC"
             }
@@ -36,7 +36,7 @@ namespace LeagueItems
             "Cap On-Hit Damage",
             true,
             "Whether or not the on-hit damage should be capped at a certain ratio of the attack's base damage. If false, BotRK on-hit damage has no cap.",
-            new System.Collections.Generic.List<string>()
+            new List<string>()
             {
                 "ITEM_BLADEOFTHERUINEDKING_DESC"
             }
@@ -47,7 +47,7 @@ namespace LeagueItems
             "Max Damage Cap",
             100f,
             "Maximum damage per proc as a percentage of the initial damage (e.g. if your attack does 12 damage, BotRK does a max of 12 damage).",
-            new System.Collections.Generic.List<string>()
+            new List<string>()
             {
                 "ITEM_BLADEOFTHERUINEDKING_DESC"
             }
@@ -269,7 +269,7 @@ namespace LeagueItems
             LanguageAPI.Add("BotrkDesc", desc);
 
             // The Lore is, well, flavor. You can write pretty much whatever you want here.
-            LanguageAPI.Add("BotrkLore", "A sword belonging to the Shadow Isles.");
+            LanguageAPI.Add("BotrkLore", "");
         }
     }
 }
