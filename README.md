@@ -2,8 +2,8 @@
 Adds League of Legends items for Risk of Rain 2.
 
 
-#! THIS MOD IS DEPRECATED !
-#Check out this one [Debonairesnake6/LoLItems](https://github.com/Debonairesnake6/LoLItems)
+# ! THIS MOD IS DEPRECATED !
+# Check out this one [Debonairesnake6/LoLItems](https://github.com/Debonairesnake6/LoLItems)
 
 ## Added Items
 These values are configurable. To do so, run the game once with the mod installed, then navigate to the LeagueItems_Scaling.cfg file, edit the values and relaunch the game.
